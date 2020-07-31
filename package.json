@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/merkleTree.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "Roman Semenov <semenov.roma@gmail.com>",
@@ -14,7 +15,9 @@
     "circomlib": "git+https://github.com/tornadocash/circomlib.git#c372f14d324d57339c88451834bf2824e73bbdbc"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
+    "eslint": "^7.5.0",
     "mocha": "^8.1.0"
   }
 }

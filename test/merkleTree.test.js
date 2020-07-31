@@ -7,13 +7,8 @@ require('chai').should()
 describe('MerkleTree', () => {
   describe('#constructor', () => {
     it('should have correct zero root', () => {
-      const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
-      tree.insert(6)
-      tree.update(3, 42)
-      const proof = tree.proof(tree.indexOf(3))
-      console.log(proof)
-      // const tree = new MerkleTree(10)
-      // return tree.root().should.equal('14030416097908897320437553787826300082392928432242046897689557706485311282736')
+      const tree = new MerkleTree(10)
+      return tree.root().should.equal('14030416097908897320437553787826300082392928432242046897689557706485311282736')
     })
 
     it('should have correct 1 element root', () => {
