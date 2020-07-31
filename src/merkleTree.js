@@ -24,9 +24,12 @@ class MerkleTree {
    */
   constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
     this.levels = levels
-    this.capacity = 2 << levels
+    this.capacity = 1 << levels
     this.zeroElement = zeroElement
     this._hash = hashFunction || defaultHash
+    if (elements.length > this.capacity) {
+      throw new Error('Tree is full')
+    }
 
     this._zeros = []
     this._layers = []
@@ -89,7 +92,7 @@ class MerkleTree {
    * @param element Updated element value
    */
   update(index, element) {
-    if (index < 0 || index > this._layers[0].length || index >= this.capacity) {
+    if (isNaN(Number(index)) || index < 0 || index > this._layers[0].length || index >= this.capacity) {
       throw new Error('Insert index out of bounds: ' + index)
     }
     this._layers[0][index] = element
@@ -106,11 +109,11 @@ class MerkleTree {
 
   /**
    * Get merkle path to a leaf
-   * @param index Leaf index to generate path for
+   * @param {number} index Leaf index to generate path for
    * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
    */
   path(index) {
-    if (index < 0 || index >= this._layers[0].length) {
+    if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }
     const pathElements = []
