@@ -1,5 +1,5 @@
 {
-  "name": "merkle-tree",
+  "name": "fixed-merkle-tree",
   "version": "0.1.0",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
   "main": "src/merkleTree.js",
