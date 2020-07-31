@@ -185,7 +185,7 @@ describe('MerkleTree', () => {
     })
 
     it('should work for correct string index', () => {
-      const tree = new MerkleTree(10, [1, 2, 3, 4, 5]);
+      const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       const path = tree.path('2')
       path.pathIndices.should.be.deep.equal([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
       path.pathElements.should.be.deep.equal([
