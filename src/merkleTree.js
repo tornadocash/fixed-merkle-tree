@@ -4,7 +4,23 @@ const defaultHash = require('./mimc')
 
 // todo ensure consistent types in tree and inserted elements?
 // todo make sha3 default hasher (and update tests) to get rid of mimc/snarkjs/circomlib dependency
+
+/**
+ * @callback hashFunction
+ * @param left Left leaf
+ * @param right Right leaf
+ */
+/**
+ * Merkle tree
+ */
 class MerkleTree {
+  /**
+   * Constructor
+   * @param {number} levels Number of levels in the tree
+   * @param {Array} [elements] Initial elements
+   * @param [zeroElement] Value for non-existent leaves
+   * @param {hashFunction} [hashFunction] Function used to hash 2 leaves
+   */
   constructor(levels, elements = [], zeroElement = DEFAULT_ZERO, hashFunction) {
     this.levels = levels
     this.capacity = 2 << levels
@@ -33,10 +49,18 @@ class MerkleTree {
     }
   }
 
+  /**
+   * Get tree root
+   * @returns {*}
+   */
   root() {
     return this._layers[this.levels]?.[0] ?? this._zeros[this.levels]
   }
 
+  /**
+   * Insert new element into the tree
+   * @param element Element to insert
+   */
   insert(element) {
     if (this._layers[0].length >= this.capacity) {
       throw new Error('Tree is full')
@@ -44,14 +68,23 @@ class MerkleTree {
     this.update(this._layers[0].length, element)
   }
 
+  /**
+   * Insert multiple elements into the tree. Tree will be fully rebuilt during this operation.
+   * @param {Array} elements Elements to insert
+   */
   bulkInsert(elements) {
-    if (this._layers[0].length + elements > this.capacity) {
+    if (this._layers[0].length + elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
     this._layers[0].push(...elements)
     this._rebuild()
   }
 
+  /**
+   * Change an element in the tree
+   * @param {number} index Index of element to change
+   * @param element Updated element value
+   */
   update(index, element) {
     if (index < 0 || index > this._layers[0].length || index >= this.capacity) {
       throw new Error('Insert index out of bounds: ' + index)
@@ -66,6 +99,11 @@ class MerkleTree {
     }
   }
 
+  /**
+   * Get merkle proof for a leaf
+   * @param index Leaf index to generate proof for
+   * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
+   */
   proof(index) {
     if (index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
@@ -83,6 +121,11 @@ class MerkleTree {
     }
   }
 
+  /**
+   * Find an element in the tree
+   * @param element An element to find
+   * @returns {number} Index if element is found, otherwise -1
+   */
   indexOf(element) {
     return this._layers[0].indexOf(element)
   }
