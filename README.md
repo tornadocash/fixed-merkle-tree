@@ -2,8 +2,6 @@
 
 This is a fixed depth merkle tree implementation with sequential inserts
 
-Requires Node.js >= 14
-
 ## Usage
 
 ```javascript
