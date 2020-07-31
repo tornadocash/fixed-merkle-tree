@@ -89,7 +89,7 @@ describe('MerkleTree', () => {
     it('should work for even index', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       const proof = tree.proof(2)
-      proof.pathIndex.should.be.deep.equal([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
+      proof.pathIndices.should.be.deep.equal([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
       proof.pathElements.should.be.deep.equal([
         4,
         '19814528709687996974327303300007262407299502847885145507292406548098437687919',
@@ -107,7 +107,7 @@ describe('MerkleTree', () => {
     it('should work for odd index', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       const proof = tree.proof(3)
-      proof.pathIndex.should.be.deep.equal([1, 1, 0, 0, 0, 0, 0, 0, 0, 0])
+      proof.pathIndices.should.be.deep.equal([1, 1, 0, 0, 0, 0, 0, 0, 0, 0])
       proof.pathElements.should.be.deep.equal([
         3,
         '19814528709687996974327303300007262407299502847885145507292406548098437687919',

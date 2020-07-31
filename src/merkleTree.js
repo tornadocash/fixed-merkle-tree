@@ -18,10 +18,11 @@ class MerkleTree {
    * Constructor
    * @param {number} levels Number of levels in the tree
    * @param {Array} [elements] Initial elements
-   * @param [zeroElement] Value for non-existent leaves
-   * @param {hashFunction} [hashFunction] Function used to hash 2 leaves
+   * @param {Object} options
+   * @param {hashFunction} [options.hashFunction] Function used to hash 2 leaves
+   * @param [options.zeroElement] Value for non-existent leaves
    */
-  constructor(levels, elements = [], zeroElement = DEFAULT_ZERO, hashFunction) {
+  constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
     this.levels = levels
     this.capacity = 2 << levels
     this.zeroElement = zeroElement
@@ -113,9 +114,9 @@ class MerkleTree {
       throw new Error('Index out of bounds: ' + index)
     }
     const pathElements = []
-    const pathIndex = []
+    const pathIndices = []
     for (let level = 0; level < this.levels; level++) {
-      pathIndex[level] = index % 2
+      pathIndices[level] = index % 2
       pathElements[level] = (index ^ 1) < this._layers[level].length ?
         this._layers[level][index ^ 1] :
         this._zeros[level]
@@ -123,7 +124,7 @@ class MerkleTree {
     }
     return {
       pathElements,
-      pathIndex,
+      pathIndices,
     }
   }
 
@@ -134,6 +135,14 @@ class MerkleTree {
    */
   indexOf(element) {
     return this._layers[0].indexOf(element)
+  }
+
+  /**
+   * Returns a copy of non-zero tree elements
+   * @returns {Object[]}
+   */
+  elements() {
+    return this._layers[0].slice()
   }
 }
 
