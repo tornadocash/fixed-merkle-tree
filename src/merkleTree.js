@@ -105,11 +105,11 @@ class MerkleTree {
   }
 
   /**
-   * Get merkle proof for a leaf
-   * @param index Leaf index to generate proof for
+   * Get merkle path to a leaf
+   * @param index Leaf index to generate path for
    * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
    */
-  proof(index) {
+  path(index) {
     if (index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }

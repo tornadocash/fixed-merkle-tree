@@ -9,8 +9,8 @@ const MerkleTree = require('MerkleTree')
 const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
 tree.insert(6)
 tree.update(3, 42)
-const proof = tree.proof(tree.indexOf(2))
-console.log(proof)
+const path = tree.path(tree.indexOf(2))
+console.log(path)
 
 // output:
 {
