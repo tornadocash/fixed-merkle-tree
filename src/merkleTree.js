@@ -139,8 +139,7 @@ class MerkleTree {
    */
   indexOf(element, comparator) {
     if (comparator) {
-      const result = this._layers[0].findIndex((el) => comparator(element, el))
-      return result === undefined ? -1 : result
+      return this._layers[0].findIndex((el) => comparator(element, el))
     } else {
       return this._layers[0].indexOf(element)
     }
