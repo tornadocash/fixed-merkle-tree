@@ -134,10 +134,16 @@ class MerkleTree {
   /**
    * Find an element in the tree
    * @param element An element to find
+   * @param comparator A function that checks leaf value equality
    * @returns {number} Index if element is found, otherwise -1
    */
-  indexOf(element) {
-    return this._layers[0].indexOf(element)
+  indexOf(element, comparator) {
+    if (comparator) {
+      const result = this._layers[0].findIndex((el) => comparator(element, el))
+      return result === undefined ? -1 : result
+    } else {
+      return this._layers[0].indexOf(element)
+    }
   }
 
   /**
