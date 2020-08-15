@@ -1,19 +1,25 @@
 {
   "name": "fixed-merkle-tree",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
   "main": "src/merkleTree.js",
   "scripts": {
     "test": "mocha",
     "lint": "eslint ."
   },
-  "keywords": ["merkle", "tree", "merkleTree"],
+  "keywords": [
+    "merkle",
+    "tree",
+    "merkleTree"
+  ],
   "author": "Roman Semenov <semenov.roma@gmail.com>",
   "license": "ISC",
-  "files": ["src/*"],
+  "files": [
+    "src/*"
+  ],
   "dependencies": {
     "snarkjs": "git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5",
-    "circomlib": "git+https://github.com/tornadocash/circomlib.git#c372f14d324d57339c88451834bf2824e73bbdbc"
+    "circomlib": "git+https://github.com/tornadocash/circomlib.git#6282474dc03e47a7cba1486e6ac8df08842314c3"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
