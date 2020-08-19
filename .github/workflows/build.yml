@@ -1,4 +1,4 @@
-name: Node.js CI
+name: build
 
 on:
   pull_request:
@@ -16,6 +16,14 @@ jobs:
           node-version: 14.7.0
       - run: npm ci
       - run: npm run test
+      - name: Telegram Failure Notification
+        uses: appleboy/telegram-action@0.0.7
+        if: failure()
+        with:
+          message: ❗ Build failed for [${{ github.repository }}](https://github.com/${{ github.repository }}/actions) because of ${{ github.actor }}
+          format: markdown
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest
@@ -26,6 +34,14 @@ jobs:
           node-version: 14.7.0
       - run: npm ci
       - run: npm run lint
+      - name: Telegram Failure Notification
+        uses: appleboy/telegram-action@0.0.7
+        if: failure()
+        with:
+          message: ❗ Build failed for [${{ github.repository }}](https://github.com/${{ github.repository }}/actions) because of ${{ github.actor }}
+          format: markdown
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
   publish:
     runs-on: ubuntu-latest
@@ -65,3 +81,12 @@ jobs:
           message: 🚀 Published [${{ steps.vars.outputs.repo_name }}](https://github.com/${{ github.repository }}) version [${{ steps.vars.outputs.version }}](https://www.npmjs.com/package/${{ steps.vars.outputs.repo_name }}/v/${{ steps.vars.outputs.version }}) to npm
           debug: true
           format: markdown
+
+      - name: Telegram Failure Notification
+        uses: appleboy/telegram-action@0.0.7
+        if: failure()
+        with:
+          message: ❗ Failed to publish [${{ steps.vars.outputs.repo_name }}](https://github.com/${{ github.repository }}/actions) because of ${{ env.GITHUB_ACTOR }}
+          format: markdown
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}

@@ -1,4 +1,4 @@
-# Merkle Tree [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tornadocash/fixed-merkle-tree/Node.js%20CI)](https://github.com/tornadocash/fixed-merkle-tree/actions) [![npm](https://img.shields.io/npm/v/fixed-merkle-tree)](https://www.npmjs.com/package/fixed-merkle-tree)
+# Merkle Tree [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tornadocash/fixed-merkle-tree/build)](https://github.com/tornadocash/fixed-merkle-tree/actions) [![npm](https://img.shields.io/npm/v/fixed-merkle-tree)](https://www.npmjs.com/package/fixed-merkle-tree)
 
 This is a fixed depth merkle tree implementation with sequential inserts
 
