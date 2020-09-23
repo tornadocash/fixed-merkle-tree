@@ -1,6 +1,6 @@
 {
   "name": "fixed-merkle-tree",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
   "main": "src/merkleTree.js",
   "scripts": {

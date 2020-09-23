@@ -152,6 +152,36 @@ class MerkleTree {
   elements() {
     return this._layers[0].slice()
   }
+
+  /**
+   * Serialize entire tree state including intermediate layers into a plain object
+   * Deserializing it back will not require to recompute any hashes
+   * Elements are not converted to a plain type, this is responsibility of the caller
+   */
+  serialize() {
+    return {
+      levels: this.levels,
+      capacity: this.capacity,
+      zeroElement: this.zeroElement,
+      _zeros: this._zeros,
+      _layers: this._layers,
+    }
+  }
+
+  /**
+   * Deserialize data into a MerkleTree instance
+   * Make sure to provide the same hashFunction as was used in the source tree,
+   * otherwise the tree state will be invalid
+   *
+   * @param data
+   * @param hashFunction
+   * @returns {MerkleTree}
+   */
+  static deserialize(data, hashFunction) {
+    const instance = Object.assign(Object.create(this.prototype), data)
+    instance._hash = hashFunction || defaultHash
+    return instance
+  }
 }
 
 module.exports = MerkleTree

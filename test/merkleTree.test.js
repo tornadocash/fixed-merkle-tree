@@ -202,4 +202,19 @@ describe('MerkleTree', () => {
       ])
     })
   })
+
+  describe('#serialize', () => {
+    it('should work', () => {
+      const src = new MerkleTree(10, [1, 2, 3])
+      const data = src.serialize()
+      const dst = MerkleTree.deserialize(data)
+
+      src.root().should.equal(dst.root())
+
+      src.insert(10)
+      dst.insert(10)
+
+      src.root().should.equal(dst.root())
+    })
+  })
 })
