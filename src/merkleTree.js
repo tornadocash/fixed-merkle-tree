@@ -161,8 +161,6 @@ class MerkleTree {
   serialize() {
     return {
       levels: this.levels,
-      capacity: this.capacity,
-      zeroElement: this.zeroElement,
       _zeros: this._zeros,
       _layers: this._layers,
     }
@@ -180,6 +178,8 @@ class MerkleTree {
   static deserialize(data, hashFunction) {
     const instance = Object.assign(Object.create(this.prototype), data)
     instance._hash = hashFunction || defaultHash
+    instance.capacity = 1 << instance.levels
+    instance.zeroElement = instance._zeros[0]
     return instance
   }
 }
