@@ -24,7 +24,7 @@ class MerkleTree {
    */
   constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
     this.levels = levels
-    this.capacity = 1 << levels
+    this.capacity = 2 ** levels
     this.zeroElement = zeroElement
     this._hash = hashFunction || defaultHash
     if (elements.length > this.capacity) {
@@ -177,7 +177,7 @@ class MerkleTree {
   static deserialize(data, hashFunction) {
     const instance = Object.assign(Object.create(this.prototype), data)
     instance._hash = hashFunction || defaultHash
-    instance.capacity = 1 << instance.levels
+    instance.capacity = 2 ** instance.levels
     instance.zeroElement = instance._zeros[0]
     return instance
   }
