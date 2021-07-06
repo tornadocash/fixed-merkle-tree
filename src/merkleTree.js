@@ -49,7 +49,7 @@ class MerkleTree {
           this._layers[level - 1][i * 2],
           i * 2 + 1 < this._layers[level - 1].length
             ? this._layers[level - 1][i * 2 + 1]
-            : this._zeros[level - 1]
+            : this._zeros[level - 1],
         )
       }
     }
@@ -102,7 +102,7 @@ class MerkleTree {
         this._layers[level - 1][index * 2],
         index * 2 + 1 < this._layers[level - 1].length
           ? this._layers[level - 1][index * 2 + 1]
-          : this._zeros[level - 1]
+          : this._zeros[level - 1],
       )
     }
   }
