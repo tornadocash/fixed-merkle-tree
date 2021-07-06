@@ -47,9 +47,9 @@ class MerkleTree {
       for (let i = 0; i < Math.ceil(this._layers[level - 1].length / 2); i++) {
         this._layers[level][i] = this._hash(
           this._layers[level - 1][i * 2],
-          i * 2 + 1 < this._layers[level - 1].length ?
-            this._layers[level - 1][i * 2 + 1] :
-            this._zeros[level - 1],
+          i * 2 + 1 < this._layers[level - 1].length
+            ? this._layers[level - 1][i * 2 + 1]
+            : this._zeros[level - 1]
         )
       }
     }
@@ -100,9 +100,9 @@ class MerkleTree {
       index >>= 1
       this._layers[level][index] = this._hash(
         this._layers[level - 1][index * 2],
-        index * 2 + 1 < this._layers[level - 1].length ?
-          this._layers[level - 1][index * 2 + 1] :
-          this._zeros[level - 1],
+        index * 2 + 1 < this._layers[level - 1].length
+          ? this._layers[level - 1][index * 2 + 1]
+          : this._zeros[level - 1]
       )
     }
   }
@@ -120,9 +120,8 @@ class MerkleTree {
     const pathIndices = []
     for (let level = 0; level < this.levels; level++) {
       pathIndices[level] = index % 2
-      pathElements[level] = (index ^ 1) < this._layers[level].length ?
-        this._layers[level][index ^ 1] :
-        this._zeros[level]
+      pathElements[level] =
+        (index ^ 1) < this._layers[level].length ? this._layers[level][index ^ 1] : this._zeros[level]
       index >>= 1
     }
     return {
