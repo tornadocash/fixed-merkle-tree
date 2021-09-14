@@ -1,9 +1,5 @@
-// keccak256("tornado") % BN254_FIELD_SIZE
-const DEFAULT_ZERO = '21663839004416932945382355908790599225266501822907911457504978515578255421292'
-const defaultHash = require('./mimc')
-
+const defaultHash = require('./sha256')
 // todo ensure consistent types in tree and inserted elements?
-// todo make sha3 default hasher (and update tests) to get rid of mimc/snarkjs/circomlib dependency
 
 /**
  * @callback hashFunction
@@ -22,7 +18,7 @@ class MerkleTree {
    * @param {hashFunction} [options.hashFunction] Function used to hash 2 leaves
    * @param [options.zeroElement] Value for non-existent leaves
    */
-  constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
+  constructor(levels, elements = [], { hashFunction, zeroElement = 0 } = {}) {
     this.levels = levels
     this.capacity = 2 ** levels
     if (elements.length > this.capacity) {
