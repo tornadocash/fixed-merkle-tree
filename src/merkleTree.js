@@ -22,22 +22,21 @@ class MerkleTree {
    * @param {hashFunction} [options.hashFunction] Function used to hash 2 leaves
    * @param [options.zeroElement] Value for non-existent leaves
    */
-  constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
+  constructor(levels, elements = [], { hashFunction = defaultHash, zeroElement = DEFAULT_ZERO } = {}) {
     this.levels = levels
     this.capacity = 2 ** levels
-    this.zeroElement = zeroElement
-    this._hash = hashFunction || defaultHash
     if (elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
-
+    this._hash = hashFunction
+    this.zeroElement = zeroElement
     this._zeros = []
-    this._layers = []
-    this._layers[0] = elements
-    this._zeros[0] = this.zeroElement
+    this._zeros[0] = zeroElement
     for (let i = 1; i <= levels; i++) {
       this._zeros[i] = this._hash(this._zeros[i - 1], this._zeros[i - 1])
     }
+    this._layers = []
+    this._layers[0] = elements.slice()
     this._rebuild()
   }
 
@@ -150,6 +149,14 @@ class MerkleTree {
    */
   elements() {
     return this._layers[0].slice()
+  }
+
+  /**
+   * Returns a copy of n-th zero elements array
+   * @returns {Object[]}
+   */
+  zeros() {
+    return this._zeros.slice()
   }
 
   /**

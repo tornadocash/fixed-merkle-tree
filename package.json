@@ -1,7 +1,8 @@
 {
   "name": "fixed-merkle-tree",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
+  "repository": "https://github.com/tornadocash/fixed-merkle-tree.git",
   "main": "src/merkleTree.js",
   "scripts": {
     "test": "mocha",
