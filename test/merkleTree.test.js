@@ -71,6 +71,32 @@ describe('MerkleTree', () => {
       tree.root().should.equal('10132905325673518287563057607527946096399700874345297651940963130460267058606')
     })
 
+    it('should give the same result as sequental inserts', () => {
+      const initialArray = [
+        [1],
+        [1, 2],
+        [1, 2, 3],
+        [1, 2, 3, 4],
+      ]
+      const insertedArray = [
+        [11],
+        [11, 12],
+        [11, 12, 13],
+        [11, 12, 13, 14],
+      ]
+      for (const initial of initialArray) {
+        for (const inserted of insertedArray) {
+          const tree1 = new MerkleTree(10, initial)
+          const tree2 = new MerkleTree(10, initial)
+          tree1.bulkInsert(inserted)
+          for (const item of inserted) {
+            tree2.insert(item)
+          }
+          tree1.root().should.equal(tree2.root())
+        }
+      }
+    }).timeout(10000)
+
     it('should work with max elements', () => {
       const tree = new MerkleTree(2, [1, 2])
       tree.bulkInsert([3, 4])

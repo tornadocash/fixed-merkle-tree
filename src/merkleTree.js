@@ -25,19 +25,18 @@ class MerkleTree {
   constructor(levels, elements = [], { hashFunction, zeroElement = DEFAULT_ZERO } = {}) {
     this.levels = levels
     this.capacity = 2 ** levels
-    this.zeroElement = zeroElement
-    this._hash = hashFunction || defaultHash
     if (elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
-
+    this._hash = hashFunction || defaultHash
+    this.zeroElement = zeroElement
     this._zeros = []
-    this._layers = []
-    this._layers[0] = elements
-    this._zeros[0] = this.zeroElement
+    this._zeros[0] = zeroElement
     for (let i = 1; i <= levels; i++) {
       this._zeros[i] = this._hash(this._zeros[i - 1], this._zeros[i - 1])
     }
+    this._layers = []
+    this._layers[0] = elements.slice()
     this._rebuild()
   }
 
@@ -75,15 +74,30 @@ class MerkleTree {
   }
 
   /**
-   * Insert multiple elements into the tree. Tree will be fully rebuilt during this operation.
+   * Insert multiple elements into the tree.
    * @param {Array} elements Elements to insert
    */
   bulkInsert(elements) {
     if (this._layers[0].length + elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
-    this._layers[0].push(...elements)
-    this._rebuild()
+    // First we insert all elements except the last one
+    // updating only full subtree hashes (all layers where inserted element has odd index)
+    // the last element will update the full path to the root making the tree consistent again
+    for (let i = 0; i < elements.length - 1; i++) {
+      this._layers[0].push(elements[i])
+      let level = 0
+      let index = this._layers[0].length - 1
+      while (index % 2 === 1) {
+        level++
+        index >>= 1
+        this._layers[level][index] = this._hash(
+          this._layers[level - 1][index * 2],
+          this._layers[level - 1][index * 2 + 1],
+        )
+      }
+    }
+    this.insert(elements[elements.length - 1])
   }
 
   /**
@@ -150,6 +164,14 @@ class MerkleTree {
    */
   elements() {
     return this._layers[0].slice()
+  }
+
+  /**
+   * Returns a copy of n-th zero elements array
+   * @returns {Object[]}
+   */
+  zeros() {
+    return this._zeros.slice()
   }
 
   /**
