@@ -78,6 +78,10 @@ class MerkleTree {
    * @param {Array} elements Elements to insert
    */
   bulkInsert(elements) {
+    if (!elements.length) {
+      return
+    }
+
     if (this._layers[0].length + elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
