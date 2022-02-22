@@ -130,15 +130,23 @@ export default class MerkleTree {
     let elIndex = +index
     const pathElements: Element[] = []
     const pathIndices: number[] = []
+    const layerIndices: number[] = []
     for (let level = 0; level < this.levels; level++) {
       pathIndices[level] = elIndex % 2
-      pathElements[level] =
-        (elIndex ^ 1) < this._layers[level].length ? this._layers[level][elIndex ^ 1] : this._zeros[level]
+      const leafIndex = elIndex ^ 1
+      if (leafIndex < this._layers[level].length) {
+        pathElements[level] = this._layers[level][leafIndex]
+        layerIndices[level] = leafIndex
+      } else {
+        pathElements[level] = this._zeros[level]
+        layerIndices[level] = 0
+      }
       elIndex >>= 1
     }
     return {
       pathElements,
       pathIndices,
+      layerIndices,
     }
   }
 
@@ -154,6 +162,25 @@ export default class MerkleTree {
     } else {
       return this._layers[0].indexOf(element)
     }
+  }
+
+  getTreeEdge(edgeElement: Element, index?: number) {
+    if (edgeElement === 'undefined') {
+      throw new Error('element is required')
+    }
+    let edgeIndex: number
+    if (!Number.isInteger(index)) {
+      index = -1
+      const leaves = this._layers[0]
+      index = leaves.indexOf(edgeElement)
+      edgeIndex = index
+    }
+
+    if (index <= -1) {
+      return []
+    }
+    const edgePath = this.path(index)
+    return { edgePath, edgeElement, edgeIndex }
   }
 
   /**
