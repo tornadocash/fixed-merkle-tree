@@ -6,6 +6,14 @@ const DEFAULT_ZERO = '2166383900441693294538235590879059922526650182290791145750
 const defaultHash = (left: Element, right: Element): string => mimcsponge.multiHash([BigInt(left), BigInt(right)]).toString()
 
 export default class MerkleTree {
+  get layers(): Array<Element[]> {
+    return this._layers.slice()
+  }
+
+  set layers(value: Array<Element[]>) {
+    this._layers = value
+  }
+
   levels: number
   capacity: number
   private _hash: HashFunction
@@ -186,15 +194,40 @@ export default class MerkleTree {
   /**
    * Returns a copy of non-zero tree elements.
    */
-  elements() {
+  get elements() {
     return this._layers[0].slice()
   }
 
   /**
    * Returns a copy of n-th zero elements array
    */
-  zeros() {
+  get zeros() {
     return this._zeros.slice()
+  }
+
+  getLayersAsObject() {
+    const layers = this.layers
+    const objs = []
+    for (let i = 0; i < this.levels; i++) {
+      const arr = []
+      for (let j = 0; j < layers[i].length; j++) {
+        const obj = { [layers[i][j]]: null }
+        if (objs.length) {
+          obj[layers[i][j]] = {}
+          const a = objs.shift()
+          const akey = Object.keys(a)[0]
+          obj[layers[i][j]][akey] = a[akey]
+          if (objs.length) {
+            const b = objs.shift()
+            const bkey = Object.keys(b)[0]
+            obj[layers[i][j]][bkey] = b[bkey]
+          }
+        }
+        arr.push(obj)
+      }
+      objs.push(...arr)
+    }
+    return objs[0]
   }
 
   /**

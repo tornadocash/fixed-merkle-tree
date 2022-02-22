@@ -1,5 +1,6 @@
 import MerkleTree from '../src'
 import { assert, should } from 'chai'
+import { it } from 'mocha'
 
 describe('MerkleTree', () => {
 
@@ -229,6 +230,48 @@ describe('MerkleTree', () => {
         '17235543131546745471991808272245772046758360534180976603221801364506032471936',
         '155962837046691114236524362966874066300454611955781275944230309195800494087',
       ])
+    })
+  })
+
+  describe('#getters', () => {
+    const elements = [1, 2, 3, 4, 5]
+    const layers = [
+      [1, 2, 3, 4, 5],
+      [
+        '19814528709687996974327303300007262407299502847885145507292406548098437687919',
+        '9256022917525827637821171443533757190340579068025270193352322268529570863974',
+        '21652272025144185891702495507858700052653521882982711576347377471507927142323',
+      ],
+      [
+        '6464294476958346139385024074008223400825166653076969388043746597957512245037',
+        '21305827034995891902714687670641862055126514524916463201449278400604999416145',
+      ],
+      ['13482485030738390475684870940688026655293260583748749623167469686138055064771'],
+      ['5734482689596254215043546232260442114954448597263096309106433719494772338840'],
+    ]
+
+    it('should return same elements in array', () => {
+      const tree = new MerkleTree(10, elements)
+      assert.deepEqual(tree.elements, elements)
+    })
+    it('should return copy of elements array', () => {
+      const tree = new MerkleTree(10, elements)
+      const elements1 = tree.elements
+      tree.insert(6)
+      const elements2 = tree.elements
+      should().not.equal(elements1, elements2)
+    })
+
+    it('should return same layers in array', () => {
+      const tree = new MerkleTree(4, elements)
+      assert.deepEqual(tree.layers, layers)
+    })
+    it('should return copy of elements array', () => {
+      const tree = new MerkleTree(4, elements)
+      const layers1 = tree.layers
+      tree.insert(6)
+      const layers2 = tree.layers
+      should().not.equal(layers1, layers2)
     })
   })
 
