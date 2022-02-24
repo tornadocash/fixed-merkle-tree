@@ -1,9 +1,6 @@
-import { mimcsponge } from 'circomlib'
+import simpleHash from './simpleHash'
 
-// keccak256("tornado") % BN254_FIELD_SIZE
-const DEFAULT_ZERO = '21663839004416932945382355908790599225266501822907911457504978515578255421292'
-
-const defaultHash = (left: Element, right: Element): string => mimcsponge.multiHash([BigInt(left), BigInt(right)]).toString()
+const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
 
 export default class MerkleTree {
   get layers(): Array<Element[]> {
@@ -23,7 +20,7 @@ export default class MerkleTree {
 
   constructor(levels: number, elements: Element[] = [], {
     hashFunction = defaultHash,
-    zeroElement = DEFAULT_ZERO,
+    zeroElement = 0,
   }: MerkleTreeOptions = {}) {
     this.levels = levels
     this.capacity = 2 ** levels
@@ -131,30 +128,30 @@ export default class MerkleTree {
    * @param {number} index Leaf index to generate path for
    * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
    */
-  path(index: Element) {
+  path(index: Element): ProofPath {
     if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }
     let elIndex = +index
     const pathElements: Element[] = []
     const pathIndices: number[] = []
-    const layerIndices: number[] = []
+    const pathPositions: number [] = []
     for (let level = 0; level < this.levels; level++) {
       pathIndices[level] = elIndex % 2
       const leafIndex = elIndex ^ 1
       if (leafIndex < this._layers[level].length) {
         pathElements[level] = this._layers[level][leafIndex]
-        layerIndices[level] = leafIndex
+        pathPositions[level] = leafIndex
       } else {
         pathElements[level] = this._zeros[level]
-        layerIndices[level] = 0
+        pathPositions[level] = 0
       }
       elIndex >>= 1
     }
     return {
       pathElements,
       pathIndices,
-      layerIndices,
+      pathPositions,
     }
   }
 
@@ -268,6 +265,9 @@ export type SerializedTreeState = {
   _zeros: Array<Element>,
   _layers: Array<Element[]>
 }
-export type Mimcsponge = {
-  multiHash: (arr: BigInt[], key?: Element, numOutputs?) => string
+
+export type ProofPath = {
+  pathElements: Element[],
+  pathIndices: number[],
+  pathPositions: number[],
 }

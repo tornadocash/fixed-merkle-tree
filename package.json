@@ -1,6 +1,6 @@
 {
   "name": "fixed-merkle-tree",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
   "repository": "https://github.com/tornadocash/fixed-merkle-tree.git",
   "main": "lib/index.js",
@@ -8,7 +8,9 @@
   "scripts": {
     "test": "ts-mocha 'test/*.spec.ts'",
     "build": "tsc",
-    "lint": "eslint ."
+    "clean": "rm -rf lib/",
+    "prepare": "npm run clean && npm run build",
+    "lint": "eslint src"
   },
   "keywords": [
     "merkle",
@@ -20,9 +22,7 @@
   "files": [
     "src/*"
   ],
-  "dependencies": {
-    "circomlib": "git+https://github.com/tornadocash/circomlib.git#5beb6aee94923052faeecea40135d45b6ce6172c"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/expect": "^24.3.0",
     "@types/mocha": "^9.1.0",
