@@ -13,7 +13,7 @@ export default class MerkleTree {
 
   levels: number
   capacity: number
-  private _hash: HashFunction
+  private _hashFn: HashFunction
   private zeroElement: Element
   private _zeros: Element[]
   private _layers: Array<Element[]>
@@ -27,12 +27,12 @@ export default class MerkleTree {
     if (elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
-    this._hash = hashFunction
+    this._hashFn = hashFunction
     this.zeroElement = zeroElement
     this._zeros = []
     this._zeros[0] = zeroElement
     for (let i = 1; i <= levels; i++) {
-      this._zeros[i] = this._hash(this._zeros[i - 1], this._zeros[i - 1])
+      this._zeros[i] = this._hashFn(this._zeros[i - 1], this._zeros[i - 1])
     }
     this._layers = []
     this._layers[0] = elements.slice()
@@ -43,7 +43,7 @@ export default class MerkleTree {
     for (let level = 1; level <= this.levels; level++) {
       this._layers[level] = []
       for (let i = 0; i < Math.ceil(this._layers[level - 1].length / 2); i++) {
-        this._layers[level][i] = this._hash(
+        this._layers[level][i] = this._hashFn(
           this._layers[level - 1][i * 2],
           i * 2 + 1 < this._layers[level - 1].length
             ? this._layers[level - 1][i * 2 + 1]
@@ -93,7 +93,7 @@ export default class MerkleTree {
       while (index % 2 === 1) {
         level++
         index >>= 1
-        this._layers[level][index] = this._hash(
+        this._layers[level][index] = this._hashFn(
           this._layers[level - 1][index * 2],
           this._layers[level - 1][index * 2 + 1],
         )
@@ -114,7 +114,7 @@ export default class MerkleTree {
     this._layers[0][index] = element
     for (let level = 1; level <= this.levels; level++) {
       index >>= 1
-      this._layers[level][index] = this._hash(
+      this._layers[level][index] = this._hashFn(
         this._layers[level - 1][index * 2],
         index * 2 + 1 < this._layers[level - 1].length
           ? this._layers[level - 1][index * 2 + 1]
