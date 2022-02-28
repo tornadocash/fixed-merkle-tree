@@ -1,4 +1,4 @@
-import MerkleTree from '../src'
+import { MerkleTree } from '../src'
 import { assert, should } from 'chai'
 import { it } from 'mocha'
 
@@ -74,7 +74,7 @@ describe('MerkleTree', () => {
       should().equal(tree.root(), '4066635800770511602067209448381558554624')
     })
 
-    it('should give the same result as sequental inserts', () => {
+    it('should give the same result as sequential inserts', () => {
       const initialArray = [
         [1],
         [1, 2],
@@ -277,6 +277,24 @@ describe('MerkleTree', () => {
       tree.insert(6)
       const layers2 = tree.layers
       should().not.equal(layers1, layers2)
+    })
+    it('should return correct zeros array', () => {
+      const zeros = [
+        0,
+        '1390935134112885103361924701261056180224',
+        '3223901263414086620636498663535535980544',
+        '938972308169430750202858820582946897920',
+        '3743880566844110745576746962917825445888',
+      ]
+      const tree = new MerkleTree(4, [])
+      assert.deepEqual(tree.zeros, zeros, 'Not equal')
+    })
+    it('should return copy of zeros array', () => {
+      const tree = new MerkleTree(4, [])
+      const zeros1 = tree.zeros
+      tree.insert(6)
+      const zeros2 = tree.zeros
+      should().not.equal(zeros1, zeros2)
     })
   })
 

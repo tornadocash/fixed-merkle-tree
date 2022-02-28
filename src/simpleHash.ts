@@ -5,7 +5,7 @@
  * @param hashLength
  */
 
-function simpleHash<T>(data: T[], seed?: number, hashLength = 40): string {
+export function simpleHash<T>(data: T[], seed?: number, hashLength = 40): string {
   const str = data.join('')
   let i, l,
     hval = seed ?? 0x811c9dcc5
@@ -17,4 +17,3 @@ function simpleHash<T>(data: T[], seed?: number, hashLength = 40): string {
   return BigInt('0x' + hash.padEnd(hashLength - (hash.length - 1), '0')).toString(10)
 }
 
-export default simpleHash

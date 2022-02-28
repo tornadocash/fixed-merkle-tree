@@ -1,4 +1,4 @@
-import simpleHash from '../src/simpleHash'
+import { simpleHash } from '../src'
 import { it } from 'mocha'
 import { should } from 'chai'
 

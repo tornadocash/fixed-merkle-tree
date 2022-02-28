@@ -3,3 +3,4 @@ build
 lib
 yarn-error.log
 .idea
+.nyc_output
