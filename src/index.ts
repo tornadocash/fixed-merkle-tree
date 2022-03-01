@@ -1,7 +1,7 @@
 import { simpleHash } from './simpleHash'
 
-export { default as MerkleTree } from './fixedMerkleTree'
-export { PartialMerkleTree } from './partialMerkleTree'
+export { default as MerkleTree } from './FixedMerkleTree'
+export { PartialMerkleTree } from './PartialMerkleTree'
 export { simpleHash } from './simpleHash'
 
 export type HashFunction<T> = {
@@ -31,4 +31,4 @@ export type TreeEdge = {
   edgePath: ProofPath;
   edgeIndex: number
 }
-export const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
+export const defaultHash = (left: Element, right: Element): string => (left !== null && right !== null) ? simpleHash([left, right]) : null

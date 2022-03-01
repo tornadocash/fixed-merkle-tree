@@ -1,21 +1,8 @@
-import {
-  defaultHash,
-  Element,
-  HashFunction,
-  MerkleTreeOptions,
-  ProofPath,
-  SerializedTreeState,
-  TreeEdge,
-} from './'
+import { defaultHash, Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge } from './'
 
 
 export default class MerkleTree {
-  get layers(): Array<Element[]> {
-    return this._layers.slice()
-  }
-
   levels: number
-  capacity: number
   private _hashFn: HashFunction<Element>
   private zeroElement: Element
   private _zeros: Element[]
@@ -26,7 +13,6 @@ export default class MerkleTree {
     zeroElement = 0,
   }: MerkleTreeOptions = {}) {
     this.levels = levels
-    this.capacity = 2 ** levels
     if (elements.length > this.capacity) {
       throw new Error('Tree is full')
     }
@@ -37,6 +23,22 @@ export default class MerkleTree {
     this._layers[0] = elements.slice()
     this._buildZeros()
     this._rebuild()
+  }
+
+  get capacity() {
+    return this.levels ** 2
+  }
+
+  get layers(): Array<Element[]> {
+    return this._layers.slice()
+  }
+
+  get zeros(): Element[] {
+    return this._zeros.slice()
+  }
+
+  get elements(): Element[] {
+    return this._layers[0].slice()
   }
 
   private _buildZeros() {
@@ -63,7 +65,7 @@ export default class MerkleTree {
   /**
    * Get tree root
    */
-  root(): Element {
+  get root(): Element {
     return this._layers[this.levels][0] ?? this._zeros[this.levels]
   }
 
@@ -180,24 +182,10 @@ export default class MerkleTree {
     const leaves = this._layers[0]
     const edgeIndex = leaves.indexOf(edgeElement)
     if (edgeIndex <= -1) {
-      return null
+      throw new Error('Element not found')
     }
     const edgePath = this.path(edgeIndex)
     return { edgePath, edgeElement, edgeIndex }
-  }
-
-  /**
-   * Returns a copy of non-zero tree elements.
-   */
-  get elements() {
-    return this._layers[0].slice()
-  }
-
-  /**
-   * Returns a copy of n-th zero elements array
-   */
-  get zeros() {
-    return this._zeros.slice()
   }
 
   /**

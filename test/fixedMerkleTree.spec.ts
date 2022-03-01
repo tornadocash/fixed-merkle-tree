@@ -1,6 +1,7 @@
 import { MerkleTree } from '../src'
 import { assert, should } from 'chai'
 import { it } from 'mocha'
+import { TreeEdge } from '../lib'
 
 describe('MerkleTree', () => {
 
@@ -8,22 +9,22 @@ describe('MerkleTree', () => {
 
     it('should have correct zero root', () => {
       const tree = new MerkleTree(10, [])
-      return should().equal(tree.root(), '3060353338620102847451617558650138132480')
+      return should().equal(tree.root, '3060353338620102847451617558650138132480')
     })
 
     it('should have correct 1 element root', () => {
       const tree = new MerkleTree(10, [1])
-      should().equal(tree.root(), '4059654748770657324723044385589999697920')
+      should().equal(tree.root, '4059654748770657324723044385589999697920')
     })
 
     it('should have correct even elements root', () => {
       const tree = new MerkleTree(10, [1, 2])
-      should().equal(tree.root(), '3715471817149864798706576217905179918336')
+      should().equal(tree.root, '3715471817149864798706576217905179918336')
     })
 
     it('should have correct odd elements root', () => {
       const tree = new MerkleTree(10, [1, 2, 3])
-      should().equal(tree.root(), '5199180210167621115778229238102210117632')
+      should().equal(tree.root, '5199180210167621115778229238102210117632')
     })
 
     it('should be able to create a full tree', () => {
@@ -40,19 +41,19 @@ describe('MerkleTree', () => {
     it('should insert into empty tree', () => {
       const tree = new MerkleTree(10)
       tree.insert(42)
-      should().equal(tree.root(), '750572848877730275626358141391262973952')
+      should().equal(tree.root, '750572848877730275626358141391262973952')
     })
 
     it('should insert into odd tree', () => {
       const tree = new MerkleTree(10, [1])
       tree.insert(42)
-      should().equal(tree.root(), '5008383558940708447763798816817296703488')
+      should().equal(tree.root, '5008383558940708447763798816817296703488')
     })
 
     it('should insert into even tree', () => {
       const tree = new MerkleTree(10, [1, 2])
       tree.insert(42)
-      should().equal(tree.root(), '5005864318873356880627322373636156817408')
+      should().equal(tree.root, '5005864318873356880627322373636156817408')
     })
 
     it('should insert last element', () => {
@@ -71,7 +72,7 @@ describe('MerkleTree', () => {
     it('should work', () => {
       const tree = new MerkleTree(10, [1, 2, 3])
       tree.bulkInsert([4, 5, 6])
-      should().equal(tree.root(), '4066635800770511602067209448381558554624')
+      should().equal(tree.root, '4066635800770511602067209448381558554624')
     })
 
     it('should give the same result as sequential inserts', () => {
@@ -95,7 +96,7 @@ describe('MerkleTree', () => {
           for (const item of inserted) {
             tree2.insert(item)
           }
-          should().equal(tree1.root(), tree2.root())
+          should().equal(tree1.root, tree2.root)
         }
       }
     }).timeout(10000)
@@ -122,31 +123,31 @@ describe('MerkleTree', () => {
     it('should update first element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       tree.update(0, 42)
-      should().equal(tree.root(), '3884161948856565981263417078389340635136')
+      should().equal(tree.root, '3884161948856565981263417078389340635136')
     })
 
     it('should update last element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       tree.update(4, 42)
-      should().equal(tree.root(), '3564959811529894228734180300843252711424')
+      should().equal(tree.root, '3564959811529894228734180300843252711424')
     })
 
     it('should update odd element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       tree.update(1, 42)
-      should().equal(tree.root(), '4576704573778433422699674477203122290688')
+      should().equal(tree.root, '4576704573778433422699674477203122290688')
     })
 
     it('should update even element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       tree.update(2, 42)
-      should().equal(tree.root(), '1807994110952186123819489133812038762496')
+      should().equal(tree.root, '1807994110952186123819489133812038762496')
     })
 
     it('should update extra element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4])
       tree.update(4, 5)
-      should().equal(tree.root(), '1099080610107164849381389194938128793600')
+      should().equal(tree.root, '1099080610107164849381389194938128793600')
     })
 
     it('should fail to update incorrect index', () => {
@@ -248,8 +249,22 @@ describe('MerkleTree', () => {
   })
   describe('#getTreeEdge', () => {
     it('should return correct treeEdge', () => {
+      const expectedEdge: TreeEdge = {
+        edgePath: {
+          pathElements: [
+            5,
+            '1390935134112885103361924701261056180224',
+            '1952916572242076545231119328171167580160',
+            '938972308169430750202858820582946897920'
+          ],
+          pathIndices: [ 0, 0, 1, 0 ],
+          pathPositions: [ 5, 0, 0, 0 ]
+        },
+        edgeElement: 4,
+        edgeIndex: 4
+      }
       const tree = new MerkleTree(4, [0, 1, 2, 3, 4, 5])
-      console.log(tree.getTreeEdge(4))
+      assert.deepEqual(tree.getTreeEdge(4), expectedEdge)
     })
   })
   describe('#getters', () => {
@@ -319,12 +334,12 @@ describe('MerkleTree', () => {
       const src = new MerkleTree(10, [1, 2, 3, 4, 5, 6, 7, 8, 9])
       const data = src.serialize()
       const dst = MerkleTree.deserialize(data)
-      should().equal(src.root(), dst.root())
+      should().equal(src.root, dst.root)
 
       src.insert(10)
       dst.insert(10)
 
-      should().equal(src.root(), dst.root())
+      should().equal(src.root, dst.root)
     })
   })
 })
