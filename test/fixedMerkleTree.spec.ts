@@ -1,7 +1,6 @@
-import { MerkleTree } from '../src'
+import { MerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
 import { it } from 'mocha'
-import { TreeEdge } from '../lib'
 
 describe('MerkleTree', () => {
 

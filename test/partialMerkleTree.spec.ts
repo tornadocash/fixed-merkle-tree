@@ -1,7 +1,6 @@
 import { Element, MerkleTree, PartialMerkleTree } from '../src'
 import { it } from 'mocha'
-import { should } from 'chai'
-import * as assert from 'assert'
+import { assert, should } from 'chai'
 
 describe('PartialMerkleTree', () => {
   const getTestTrees = (levels: number, elements: Element[], edgeElement: Element) => {
@@ -74,7 +73,7 @@ describe('PartialMerkleTree', () => {
     }).timeout(10000)
 
     it('should fail to insert too many elements', () => {
-      const { fullTree, partialTree } = getTestTrees(2, [1, 2, 3, 4], 3)
+      const { partialTree } = getTestTrees(2, [1, 2, 3, 4], 3)
       const call = () => partialTree.bulkInsert([5, 6, 7])
       should().throw(call, 'Tree is full')
     })

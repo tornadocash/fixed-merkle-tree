@@ -1,6 +1,5 @@
 import { defaultHash, Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge } from './'
 
-
 export default class MerkleTree {
   levels: number
   private _hashFn: HashFunction<Element>
