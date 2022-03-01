@@ -110,6 +110,12 @@ describe('MerkleTree', () => {
       const call = () => tree.bulkInsert([3, 4, 5])
       should().throw(call, 'Tree is full')
     })
+    it('should bypass empty elements', () => {
+      const elements = [1, 2, 3, 4]
+      const tree = new MerkleTree(2, elements)
+      tree.bulkInsert([])
+      assert.deepEqual(tree.elements, elements, 'No elements inserted')
+    })
   })
 
   describe('#update', () => {
@@ -162,6 +168,11 @@ describe('MerkleTree', () => {
     it('should find index', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       should().equal(tree.indexOf(3), 2)
+    })
+
+    it('should work with comparator', () => {
+      const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
+      should().equal(tree.indexOf(4, (arg0, arg1) => arg0 === arg1), 3)
     })
 
     it('should return -1 for non existent element', () => {
@@ -235,7 +246,12 @@ describe('MerkleTree', () => {
       ])
     })
   })
-
+  describe('#getTreeEdge', () => {
+    it('should return correct treeEdge', () => {
+      const tree = new MerkleTree(4, [0, 1, 2, 3, 4, 5])
+      console.log(tree.getTreeEdge(4))
+    })
+  })
   describe('#getters', () => {
     const elements = [1, 2, 3, 4, 5]
     const layers = [

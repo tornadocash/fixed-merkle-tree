@@ -1,5 +1,4 @@
 import { MerkleTree, PartialMerkleTree } from '../src'
-import { assert, should } from 'chai'
 import { it } from 'mocha'
 
 describe('PartialMerkleTree', () => {
@@ -12,7 +11,6 @@ describe('PartialMerkleTree', () => {
     const leavesAfterEdge = leaves.splice(edge.edgeIndex)
     it('should initialize merkle tree', () => {
       const partialTree = new PartialMerkleTree(edge, leavesAfterEdge, root)
-      console.log(partialTree)
       return true
     })
   })

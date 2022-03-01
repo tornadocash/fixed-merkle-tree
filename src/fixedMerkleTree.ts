@@ -14,10 +14,6 @@ export default class MerkleTree {
     return this._layers.slice()
   }
 
-  set layers(value: Array<Element[]>) {
-    this._layers = value
-  }
-
   levels: number
   capacity: number
   private _hashFn: HashFunction<Element>
@@ -86,7 +82,7 @@ export default class MerkleTree {
    * Insert multiple elements into the tree.
    * @param {Array} elements Elements to insert
    */
-  bulkInsert(elements: Element[]) {
+  bulkInsert(elements: Element[]): void {
     if (!elements.length) {
       return
     }
@@ -172,30 +168,21 @@ export default class MerkleTree {
    * @param comparator A function that checks leaf value equality
    * @returns {number} Index if element is found, otherwise -1
    */
-  indexOf(element: Element, comparator?: <T, R> (arg0: T, arg1: T) => R): number {
+  indexOf(element: Element, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
     if (comparator) {
-      return this._layers[0].findIndex((el) => comparator<Element, number>(element, el))
+      return this._layers[0].findIndex((el) => comparator<Element>(element, el))
     } else {
       return this._layers[0].indexOf(element)
     }
   }
 
-  getTreeEdge(edgeElement: Element, index?: number): TreeEdge {
-    if (edgeElement === 'undefined') {
-      throw new Error('element is required')
-    }
-    let edgeIndex: number
-    if (!Number.isInteger(index)) {
-      index = -1
-      const leaves = this._layers[0]
-      index = leaves.indexOf(edgeElement)
-      edgeIndex = index
-    }
-
-    if (index <= -1) {
+  getTreeEdge(edgeElement: Element): TreeEdge {
+    const leaves = this._layers[0]
+    const edgeIndex = leaves.indexOf(edgeElement)
+    if (edgeIndex <= -1) {
       return null
     }
-    const edgePath = this.path(index)
+    const edgePath = this.path(edgeIndex)
     return { edgePath, edgeElement, edgeIndex }
   }
 
