@@ -247,6 +247,7 @@ describe('MerkleTree', () => {
       ])
     })
   })
+
   describe('#getTreeEdge', () => {
     it('should return correct treeEdge', () => {
       const expectedEdge: TreeEdge = {
@@ -255,18 +256,24 @@ describe('MerkleTree', () => {
             5,
             '1390935134112885103361924701261056180224',
             '1952916572242076545231119328171167580160',
-            '938972308169430750202858820582946897920'
+            '938972308169430750202858820582946897920',
           ],
-          pathIndices: [ 0, 0, 1, 0 ],
-          pathPositions: [ 5, 0, 0, 0 ]
+          pathIndices: [0, 0, 1, 0],
+          pathPositions: [5, 0, 0, 0],
         },
         edgeElement: 4,
-        edgeIndex: 4
+        edgeIndex: 4,
       }
       const tree = new MerkleTree(4, [0, 1, 2, 3, 4, 5])
       assert.deepEqual(tree.getTreeEdge(4), expectedEdge)
     })
+    it('should fail if element not found', () => {
+      const tree = new MerkleTree(4, [0, 1, 2, 3, 4, 5])
+      const call = () => tree.getTreeEdge(6)
+      should().throw(call, 'Element not found')
+    })
   })
+
   describe('#getters', () => {
     const elements = [1, 2, 3, 4, 5]
     const layers = [

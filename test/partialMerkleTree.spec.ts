@@ -1,6 +1,7 @@
 import { Element, MerkleTree, PartialMerkleTree } from '../src'
 import { it } from 'mocha'
 import { should } from 'chai'
+import * as assert from 'assert'
 
 describe('PartialMerkleTree', () => {
   const getTestTrees = (levels: number, elements: Element[], edgeElement: Element) => {
@@ -99,6 +100,47 @@ describe('PartialMerkleTree', () => {
     it('should return -1 for non existent element', () => {
       const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
       should().equal(partialTree.indexOf(42), -1)
+    })
+  })
+
+  describe('#getters', () => {
+    it('should return capacity', () => {
+      const levels = 10
+      const capacity = levels ** 2
+      const { fullTree, partialTree } = getTestTrees(levels, [1, 2, 3, 4, 5], 3)
+      should().equal(fullTree.capacity, capacity)
+      should().equal(partialTree.capacity, capacity)
+    })
+
+    it('should return same elements count as full tree', () => {
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      should().equal(partialTree.elements.length, fullTree.elements.length)
+    })
+
+    it('should return same layers count as full tree', () => {
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      should().equal(partialTree.layers.length, fullTree.layers.length)
+    })
+  })
+
+  describe('#path', () => {
+
+    it('should return path for known nodes', () => {
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      assert.deepEqual(fullTree.path(4), partialTree.path(4))
+    })
+
+    it('should fail on incorrect index', () => {
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      should().throw((() => partialTree.path(-1)), 'Index out of bounds: -1')
+      should().throw((() => partialTree.path(10)), 'Index out of bounds: 10')
+      should().throw((() => partialTree.path('qwe')), 'Index out of bounds: qwe')
+    })
+
+    it('should fail if index is below edge', () => {
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      const call = () => partialTree.path(2)
+      should().throw(call, 'Index 2 is below the edge: 4')
     })
   })
 })

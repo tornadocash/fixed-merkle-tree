@@ -131,6 +131,9 @@ export class PartialMerkleTree {
     if (isNaN(Number(index)) || index < 0 || index > this._layers[0].length || index >= this.capacity) {
       throw new Error('Insert index out of bounds: ' + index)
     }
+    if (index < this._edgeLeaf.index) {
+      throw new Error(`Index ${index} is below the edge: ${this._edgeLeaf.index}`)
+    }
     this._layers[0][index] = element
     for (let level = 1; level <= this.levels; level++) {
       index >>= 1
@@ -153,6 +156,9 @@ export class PartialMerkleTree {
   path(index: Element): ProofPath {
     if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
+    }
+    if (index < this._edgeLeaf.index) {
+      throw new Error(`Index ${index} is below the edge: ${this._edgeLeaf.index}`)
     }
     let elIndex = +index
     const pathElements: Element[] = []
