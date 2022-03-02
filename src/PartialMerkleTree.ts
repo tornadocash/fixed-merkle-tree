@@ -60,6 +60,14 @@ export class PartialMerkleTree {
     return this._layers[this.levels][0] ?? this._zeros[this.levels]
   }
 
+  get edgeIndex(): number {
+    return this._edgeLeaf.index
+  }
+
+  get edgeElement(): Element {
+    return this._edgeLeaf.data
+  }
+
   private _buildTree(): void {
     const edgeLeafIndex = this._edgeLeaf.index
     this._leaves = [...Array.from({ length: edgeLeafIndex }, () => null), ...this._leavesAfterEdge]
@@ -69,7 +77,6 @@ export class PartialMerkleTree {
     this._layers = [this._leaves]
     this._buildZeros()
     this._buildHashes()
-
   }
 
   private _buildZeros() {
@@ -208,6 +215,25 @@ export class PartialMerkleTree {
   proof(element: Element): ProofPath {
     const index = this.indexOf(element)
     return this.path(index)
+  }
+
+  /**
+   * Shifts edge of tree to left
+   * @param edge new TreeEdge below current edge
+   * @param elements leaves between old and new edge
+   */
+
+  shiftEdge(edge: TreeEdge, elements: Element[]) {
+    if (this._edgeLeaf.index <= edge.edgeIndex) {
+      throw new Error(`New edgeIndex should be smaller then ${this._edgeLeaf.index}`)
+    }
+    if (elements.length !== (this._edgeLeaf.index - edge.edgeIndex)) {
+      throw new Error(`Elements length should be ${elements.length}`)
+    }
+    this._edgeLeafProof = edge.edgePath
+    this._edgeLeaf = { index: edge.edgeIndex, data: edge.edgeElement }
+    this._leavesAfterEdge = [...elements, ...this._leavesAfterEdge]
+    this._buildTree()
   }
 
   serialize(): SerializedPartialTreeState {

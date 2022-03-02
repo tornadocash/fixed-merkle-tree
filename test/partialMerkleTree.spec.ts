@@ -224,7 +224,31 @@ describe('PartialMerkleTree', () => {
       should().throw(call, 'Index 2 is below the edge: 4')
     })
   })
-
+  describe('#shiftEdge', () => {
+    it('should work', () => {
+      const levels = 20
+      const elements: Element[] = Array.from({ length: levels ** 2 }, (_, i) => i)
+      const tree = new MerkleTree(levels, elements)
+      const edge1 = tree.getTreeEdge(200)
+      const edge2 = tree.getTreeEdge(100)
+      const partialTree1 = new PartialMerkleTree(levels, edge1, elements.slice(edge1.edgeIndex), tree.root)
+      const partialTree2 = new PartialMerkleTree(levels, edge2, elements.slice(edge2.edgeIndex), tree.root)
+      partialTree1.shiftEdge(edge2, elements.slice(edge2.edgeIndex, partialTree1.edgeIndex))
+      assert.deepEqual(partialTree1.path(105), partialTree2.path(105))
+    })
+    it('should fail if new edge index is over current edge', () => {
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      const newEdge = fullTree.getTreeEdge(6)
+      const call = () => partialTree.shiftEdge(newEdge, [1, 2])
+      should().throw(call, 'New edgeIndex should be smaller then 4')
+    })
+    it('should fail if elements length are incorrect', () => {
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      const newEdge = fullTree.getTreeEdge(4)
+      const call = () => partialTree.shiftEdge(newEdge, [1, 2])
+      should().throw(call, 'Elements length should be 2')
+    })
+  })
   describe('#serialize', () => {
     it('should work', () => {
       const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6)
