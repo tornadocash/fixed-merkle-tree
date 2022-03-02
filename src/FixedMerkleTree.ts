@@ -1,12 +1,4 @@
-import {
-  Element,
-  HashFunction,
-  MerkleTreeOptions,
-  ProofPath,
-  SerializedTreeState,
-  simpleHash,
-  TreeEdge,
-} from './'
+import { Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, simpleHash, TreeEdge } from './'
 
 const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
 
