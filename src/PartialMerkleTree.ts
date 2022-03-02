@@ -167,7 +167,7 @@ export class PartialMerkleTree {
     }
   }
 
-  path(index: Element): ProofPath {
+  path(index: number): ProofPath {
     if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }
@@ -203,6 +203,11 @@ export class PartialMerkleTree {
     } else {
       return this._layers[0].indexOf(element)
     }
+  }
+
+  proof(element: Element): ProofPath {
+    const index = this.indexOf(element)
+    return this.path(index)
   }
 
   serialize(): SerializedPartialTreeState {

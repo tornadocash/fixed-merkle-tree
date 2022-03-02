@@ -163,6 +163,13 @@ describe('PartialMerkleTree', () => {
     })
   })
 
+  describe('#proof', () => {
+    it('should return proof for known leaf', () => {
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      assert.deepEqual(partialTree.proof(4), partialTree.path(3))
+    })
+  })
+
   describe('#getters', () => {
     it('should return capacity', () => {
       const levels = 10
@@ -207,6 +214,7 @@ describe('PartialMerkleTree', () => {
       const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       should().throw((() => partialTree.path(-1)), 'Index out of bounds: -1')
       should().throw((() => partialTree.path(10)), 'Index out of bounds: 10')
+      // @ts-ignore
       should().throw((() => partialTree.path('qwe')), 'Index out of bounds: qwe')
     })
 

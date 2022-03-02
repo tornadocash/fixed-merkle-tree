@@ -1,7 +1,6 @@
 import {
   Element,
   HashFunction,
-  Index,
   MerkleTreeOptions,
   ProofPath,
   SerializedTreeState,
@@ -147,7 +146,7 @@ export default class MerkleTree {
    * @param {number} index Leaf index to generate path for
    * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
    */
-  path(index: Index): ProofPath {
+  path(index: number): ProofPath {
     if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }
@@ -194,8 +193,7 @@ export default class MerkleTree {
   }
 
   getTreeEdge(edgeElement: Element): TreeEdge {
-    const leaves = this._layers[0]
-    const edgeIndex = leaves.indexOf(edgeElement)
+    const edgeIndex = this.indexOf(edgeElement)
     if (edgeIndex <= -1) {
       throw new Error('Element not found')
     }

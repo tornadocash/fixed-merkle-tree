@@ -38,6 +38,5 @@ export type TreeEdge = {
   edgePath: ProofPath;
   edgeIndex: number
 }
-export type Index = Element
 export type LeafWithIndex = { index: number, data: Element }
 
