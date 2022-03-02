@@ -1,5 +1,3 @@
-import { simpleHash } from './simpleHash'
-
 export { default as MerkleTree } from './FixedMerkleTree'
 export { PartialMerkleTree } from './PartialMerkleTree'
 export { simpleHash } from './simpleHash'
@@ -21,6 +19,15 @@ export type SerializedTreeState = {
   _layers: Array<Element[]>
 }
 
+export type SerializedPartialTreeState = {
+  levels: number,
+  leaves: Element[]
+  _zeros: Array<Element>,
+  _edgeLeafProof: ProofPath,
+  _initialRoot: Element,
+  _edgeLeaf: LeafWithIndex
+}
+
 export type ProofPath = {
   pathElements: Element[],
   pathIndices: number[],
@@ -31,4 +38,6 @@ export type TreeEdge = {
   edgePath: ProofPath;
   edgeIndex: number
 }
-export const defaultHash = (left: Element, right: Element): string => (left !== null && right !== null) ? simpleHash([left, right]) : null
+export type Index = Element
+export type LeafWithIndex = { index: number, data: Element }
+

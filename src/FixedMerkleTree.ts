@@ -1,4 +1,15 @@
-import { defaultHash, Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge } from './'
+import {
+  Element,
+  HashFunction,
+  Index,
+  MerkleTreeOptions,
+  ProofPath,
+  SerializedTreeState,
+  simpleHash,
+  TreeEdge,
+} from './'
+
+const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
 
 export default class MerkleTree {
   levels: number
@@ -21,7 +32,7 @@ export default class MerkleTree {
     this._layers = []
     this._layers[0] = elements.slice()
     this._buildZeros()
-    this._rebuild()
+    this._buildHashes()
   }
 
   get capacity() {
@@ -47,7 +58,7 @@ export default class MerkleTree {
     }
   }
 
-  _rebuild() {
+  _buildHashes() {
     for (let level = 1; level <= this.levels; level++) {
       this._layers[level] = []
       for (let i = 0; i < Math.ceil(this._layers[level - 1].length / 2); i++) {
@@ -136,7 +147,7 @@ export default class MerkleTree {
    * @param {number} index Leaf index to generate path for
    * @returns {{pathElements: Object[], pathIndex: number[]}} An object containing adjacent elements and left-right index
    */
-  path(index: Element): ProofPath {
+  path(index: Index): ProofPath {
     if (isNaN(Number(index)) || index < 0 || index >= this._layers[0].length) {
       throw new Error('Index out of bounds: ' + index)
     }
@@ -177,6 +188,11 @@ export default class MerkleTree {
     }
   }
 
+  proof(element: Element): ProofPath {
+    const index = this.indexOf(element)
+    return this.path(index)
+  }
+
   getTreeEdge(edgeElement: Element): TreeEdge {
     const leaves = this._layers[0]
     const edgeIndex = leaves.indexOf(edgeElement)
@@ -207,6 +223,10 @@ export default class MerkleTree {
    */
   static deserialize(data: SerializedTreeState, hashFunction?: HashFunction<Element>): MerkleTree {
     return new MerkleTree(data.levels, data._layers[0], { hashFunction, zeroElement: data._zeros[0] })
+  }
+
+  toString() {
+    return JSON.stringify(this.serialize())
   }
 }
 

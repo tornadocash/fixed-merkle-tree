@@ -1,6 +1,15 @@
-import { defaultHash, Element, HashFunction, MerkleTreeOptions, ProofPath, TreeEdge } from './'
+import {
+  Element,
+  HashFunction,
+  LeafWithIndex,
+  MerkleTreeOptions,
+  ProofPath,
+  SerializedPartialTreeState,
+  simpleHash,
+  TreeEdge,
+} from './'
 
-type LeafWithIndex = { index: number, data: Element }
+export const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
 
 export class PartialMerkleTree {
   levels: number
@@ -19,13 +28,15 @@ export class PartialMerkleTree {
     edgeElement,
     edgeIndex,
   }: TreeEdge, leaves: Element[], root: Element, { hashFunction, zeroElement }: MerkleTreeOptions = {}) {
+    hashFunction = hashFunction || defaultHash
+    const hashFn = (left, right) => (left !== null && right !== null) ? hashFunction(left, right) : null
     this._edgeLeafProof = edgePath
     this.zeroElement = zeroElement ?? 0
     this._edgeLeaf = { data: edgeElement, index: edgeIndex }
     this._leavesAfterEdge = leaves
     this._initialRoot = root
     this.levels = levels
-    this._hashFn = hashFunction || defaultHash
+    this._hashFn = hashFn
     this._buildTree()
   }
 
@@ -43,6 +54,10 @@ export class PartialMerkleTree {
 
   get elements(): Element[] {
     return this._layers[0].slice()
+  }
+
+  get root(): Element {
+    return this._layers[this.levels][0] ?? this._zeros[this.levels]
   }
 
   private _buildTree(): void {
@@ -148,7 +163,6 @@ export class PartialMerkleTree {
       if (level === this.levels) {
         hash = hash || this._initialRoot
       }
-      // console.log({ index, level, left, right, hash })
       this._layers[level][index] = hash
     }
   }
@@ -191,10 +205,31 @@ export class PartialMerkleTree {
     }
   }
 
-  /**
-   * Get tree root
-   */
-  get root(): Element {
-    return this._layers[this.levels][0] ?? this._zeros[this.levels]
+  serialize(): SerializedPartialTreeState {
+    const leaves = this.layers[0].slice(this._edgeLeaf.index)
+    return {
+      _initialRoot: this._initialRoot,
+      _edgeLeafProof: this._edgeLeafProof,
+      _edgeLeaf: this._edgeLeaf,
+      levels: this.levels,
+      leaves,
+      _zeros: this._zeros,
+    }
+  }
+
+  static deserialize(data: SerializedPartialTreeState, hashFunction?: HashFunction<Element>): PartialMerkleTree {
+    const edge: TreeEdge = {
+      edgePath: data._edgeLeafProof,
+      edgeElement: data._edgeLeaf.data,
+      edgeIndex: data._edgeLeaf.index,
+    }
+    return new PartialMerkleTree(data.levels, edge, data.leaves, data._initialRoot, {
+      hashFunction,
+      zeroElement: data._zeros[0],
+    })
+  }
+
+  toString() {
+    return JSON.stringify(this.serialize())
   }
 }

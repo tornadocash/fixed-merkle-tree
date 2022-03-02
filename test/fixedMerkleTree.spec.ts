@@ -1,6 +1,9 @@
 import { MerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
+import { createHash } from 'crypto'
 import { it } from 'mocha'
+
+const sha256Hash = (left, right) => createHash('sha256').update(`${left}${right}`).digest('hex')
 
 describe('MerkleTree', () => {
 
@@ -33,6 +36,11 @@ describe('MerkleTree', () => {
     it('should fail to create tree with too many elements', () => {
       const call = () => new MerkleTree(2, [1, 2, 3, 4, 5])
       should().throw(call, 'Tree is full')
+    })
+
+    it('should work with optional hash function and zero element', () => {
+      const tree = new MerkleTree(10, [1, 2, 3, 4, 5, 6], { hashFunction: sha256Hash, zeroElement: 'zero' })
+      should().equal(tree.root, 'a377b9fa0ed41add83e56f7e1d0e2ebdb46550b9d8b26b77dece60cb67283f19')
     })
   })
 
@@ -110,6 +118,7 @@ describe('MerkleTree', () => {
       const call = () => tree.bulkInsert([3, 4, 5])
       should().throw(call, 'Tree is full')
     })
+
     it('should bypass empty elements', () => {
       const elements = [1, 2, 3, 4]
       const tree = new MerkleTree(2, elements)
@@ -216,7 +225,6 @@ describe('MerkleTree', () => {
         '4986731814143931240516913804278285467648',
         '1918547053077726613961101558405545328640',
         '5444383861051812288142814494928935059456',
-
       ])
     })
 
@@ -244,6 +252,12 @@ describe('MerkleTree', () => {
         '5444383861051812288142814494928935059456',
 
       ])
+    })
+  })
+  describe('#proof', () => {
+    it('should return proof for leaf', () => {
+      const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
+      assert.deepEqual(tree.proof(4), tree.path(3))
     })
   })
 
@@ -346,6 +360,20 @@ describe('MerkleTree', () => {
       dst.insert(10)
 
       should().equal(src.root, dst.root)
+    })
+  })
+  describe('#toString', () => {
+    it('should return correct stringified representation', () => {
+      const src = new MerkleTree(10, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+      const str = src.toString()
+      const dst = MerkleTree.deserialize(JSON.parse(str))
+      should().equal(src.root, dst.root)
+
+      src.insert(10)
+      dst.insert(10)
+
+      should().equal(src.root, dst.root)
+
     })
   })
 })
