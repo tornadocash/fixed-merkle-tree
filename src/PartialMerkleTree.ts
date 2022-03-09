@@ -79,19 +79,20 @@ export class PartialMerkleTree {
       p.set(i, [c, this.edgeLeafProof.pathElements[i]])
       return p
     }, new Map())
+    this._proofMap.set(this.levels, [0, this.edgeLeafProof.pathRoot])
   }
 
   private _buildTree(): void {
     const edgeLeafIndex = this._edgeLeaf.index
     this._leaves = Array(edgeLeafIndex).concat(this._leavesAfterEdge)
-    if (this._edgeLeafProof.pathIndices[0] === 1) {
-      this._leaves[this._edgeLeafProof.pathPositions[0]] = this._edgeLeafProof.pathElements[0]
+    if (this._proofMap.has(0)) {
+      const [proofPos, proofEl] = this._proofMap.get(0)
+      this._leaves[proofPos] =  proofEl
     }
     this._layers = [this._leaves]
-
     this._buildZeros()
     // this._buildHashes()
-    this._buildHashes2()
+    this._buildHashes3()
 
   }
 
@@ -123,7 +124,6 @@ export class PartialMerkleTree {
     let nodes: Element[]
     for (let layerIndex = 1; layerIndex <= this.levels; layerIndex++) {
       nodes = this._layers[layerIndex - 1]
-      // console.log({ layerIndex, nodes })
       this._layers[layerIndex] = []
       index = layerIndex > 1 ? Math.ceil(index / 2) : index
       for (let i = 0; i < nodes.length; i += 2) {
@@ -131,14 +131,44 @@ export class PartialMerkleTree {
         const right = (i + 1 < nodes.length) ? nodes[i + 1] : this._zeros[layerIndex - 1]
         let hash: Element = this._hashFn(left, right)
         if (layerIndex === this.levels) hash = hash || this._edgeLeafProof.pathRoot
-        // console.log({ layerIndex, i, left, right, hash })
         this._layers[layerIndex].push(hash)
       }
       if (this._proofMap.has(layerIndex)) {
         const [proofPos, proofEl] = this._proofMap.get(layerIndex)
         this._layers[layerIndex][proofPos] = this._layers[layerIndex][proofPos] || proofEl
       }
+    }
+  }
 
+  _buildHashes3() {
+    let edgeIndex = this.edgeIndex
+    let nodes: Element[]
+    for (let layerIndex = 1; layerIndex <= this.levels; layerIndex++) {
+      nodes = this._layers[layerIndex - 1]
+      this._layers[layerIndex] = []
+      edgeIndex = layerIndex > 1 ? Math.ceil(edgeIndex / 2) : edgeIndex
+      // console.log(layerIndex, nodes.length, index)
+      const from = nodes.length % 2 === 0 ? nodes.length - 1 : nodes.length
+      let i = from
+      for (i; i >= 0; i -= 2) {
+        // if (i < edgeIndex - 1) {
+        //   this._layers[layerIndex].push(undefined)
+        //   break
+        // }
+        const left = nodes[i - 1]
+        const right = (i === from && nodes.length % 2 === 1) ? this._zeros[layerIndex - 1] : nodes[i]
+        let hash: Element = this._hashFn(left, right)
+        if (layerIndex === this.levels) hash = hash || this._edgeLeafProof.pathRoot
+        this._layers[layerIndex].push(hash)
+      }
+      this._layers[layerIndex].reverse()
+      // this._layers[layerIndex].concat(nodes.length > 2 ? Array(Math.ceil(index / 2)) : []).reverse()
+      // const emptyElements = Array(Math.ceil((nodes.length - (nodes.length - index)) / 2))
+      // if (nodes.length > 3) this._layers[layerIndex] = emptyElements.concat(this._layers[layerIndex])
+      if (this._proofMap.has(layerIndex)) {
+        const [proofPos, proofEl] = this._proofMap.get(layerIndex)
+        this._layers[layerIndex][proofPos] = this._layers[layerIndex][proofPos] || proofEl
+      }
     }
   }
 
@@ -206,13 +236,17 @@ export class PartialMerkleTree {
       const right = index * 2 + 1 < this._layers[level - 1].length
         ? this._layers[level - 1][index * 2 + 1]
         : this._zeros[level - 1]
-      let hash: Element = this._hashFn(left, right)
-      if (!hash && this._edgeLeafProof.pathPositions[level] === index * 2) {
-        hash = this._edgeLeafProof.pathElements[level]
+      const hash: Element = this._hashFn(left, right)
+      // if (!hash && this._edgeLeafProof.pathPositions[level] === index * 2) {
+      //   hash = this._edgeLeafProof.pathElements[level]
+      // }
+      if (this._proofMap.has(level)) {
+        const [proofPos, proofEl] = this._proofMap.get(level)
+        this._layers[level][proofPos] = this._layers[level][proofPos] || proofEl
       }
-      if (level === this.levels) {
-        hash = hash || this._initialRoot
-      }
+      // if (level === this.levels) {
+      //   hash = hash || this._initialRoot
+      // }
       this._layers[level][index] = hash
     }
   }

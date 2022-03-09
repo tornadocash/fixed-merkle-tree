@@ -10,7 +10,7 @@
     "npm": "6"
   },
   "scripts": {
-    "test": "ts-mocha 'test/*.spec.ts'",
+    "test": "ts-mocha 'test/*.spec.ts' -s 10",
     "coverage": "nyc npm run test",
     "build": "tsc",
     "clean": "rm -rf lib/",
