@@ -87,7 +87,7 @@ export class PartialMerkleTree {
     this._leaves = Array(edgeLeafIndex).concat(this._leavesAfterEdge)
     if (this._proofMap.has(0)) {
       const [proofPos, proofEl] = this._proofMap.get(0)
-      this._leaves[proofPos] =  proofEl
+      this._leaves[proofPos] = proofEl
     }
     this._layers = [this._leaves]
     this._buildZeros()
@@ -114,7 +114,7 @@ export class PartialMerkleTree {
         let hash: Element = this._hashFn(left, right)
         if (!hash && this._edgeLeafProof.pathPositions[level] === i) hash = this._edgeLeafProof.pathElements[level]
         if (level === this.levels) hash = hash || this._initialRoot
-        this._layers[level][i] = hash
+        if (hash) this._layers[level][i] = hash
       }
     }
   }
@@ -147,24 +147,23 @@ export class PartialMerkleTree {
       nodes = this._layers[layerIndex - 1]
       this._layers[layerIndex] = []
       edgeIndex = layerIndex > 1 ? Math.ceil(edgeIndex / 2) : edgeIndex
-      // console.log(layerIndex, nodes.length, index)
       const from = nodes.length % 2 === 0 ? nodes.length - 1 : nodes.length
       let i = from
       for (i; i >= 0; i -= 2) {
-        // if (i < edgeIndex - 1) {
-        //   this._layers[layerIndex].push(undefined)
-        //   break
-        // }
+        if (i < edgeIndex - 2) {
+          break
+        }
         const left = nodes[i - 1]
         const right = (i === from && nodes.length % 2 === 1) ? this._zeros[layerIndex - 1] : nodes[i]
         let hash: Element = this._hashFn(left, right)
         if (layerIndex === this.levels) hash = hash || this._edgeLeafProof.pathRoot
-        this._layers[layerIndex].push(hash)
+        if (hash) this._layers[layerIndex].push(hash)
       }
       this._layers[layerIndex].reverse()
-      // this._layers[layerIndex].concat(nodes.length > 2 ? Array(Math.ceil(index / 2)) : []).reverse()
-      // const emptyElements = Array(Math.ceil((nodes.length - (nodes.length - index)) / 2))
-      // if (nodes.length > 3) this._layers[layerIndex] = emptyElements.concat(this._layers[layerIndex])
+      const skipCount = (edgeIndex >> 1)
+      const emptyArray = nodes.length > 1 ? new Array(skipCount) : []
+      console.log(layerIndex, edgeIndex, skipCount, nodes.length)
+      this._layers[layerIndex] = emptyArray.concat(this._layers[layerIndex])
       if (this._proofMap.has(layerIndex)) {
         const [proofPos, proofEl] = this._proofMap.get(layerIndex)
         this._layers[layerIndex][proofPos] = this._layers[layerIndex][proofPos] || proofEl
