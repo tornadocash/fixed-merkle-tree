@@ -21,13 +21,15 @@ export default class MerkleTree {
     this.zeroElement = zeroElement
 
     this._layers = []
-    this._layers[0] = elements.slice()
+    const leaves = elements.slice()
+    this._layers = [leaves]
     this._buildZeros()
     this._buildHashes()
+    // this._buildHashes2(leaves)
   }
 
   get capacity() {
-    return this.levels ** 2
+    return 2 ** this.levels
   }
 
   get layers(): Array<Element[]> {
@@ -62,6 +64,20 @@ export default class MerkleTree {
       }
     }
   }
+
+  // _buildHashes2(nodes: Element[]) {
+  //   let layerIndex = 0
+  //   while (layerIndex < this.levels) {
+  //     layerIndex = this._layers.length
+  //     this._layers[layerIndex] = []
+  //     for (let i = 0; i < nodes.length; i += 2) {
+  //       const left = nodes[i]
+  //       const right = (i + 1 === nodes.length && nodes.length % 2 === 1) ? this._zeros[layerIndex - 1] : nodes[i + 1]
+  //       this._layers[layerIndex].push(this._hashFn(left, right))
+  //     }
+  //     nodes = this._layers[layerIndex]
+  //   }
+  // }
 
   /**
    * Get tree root
@@ -124,12 +140,11 @@ export default class MerkleTree {
     this._layers[0][index] = element
     for (let level = 1; level <= this.levels; level++) {
       index >>= 1
-      this._layers[level][index] = this._hashFn(
-        this._layers[level - 1][index * 2],
-        index * 2 + 1 < this._layers[level - 1].length
-          ? this._layers[level - 1][index * 2 + 1]
-          : this._zeros[level - 1],
-      )
+      const left = this._layers[level - 1][index * 2]
+      const right = index * 2 + 1 < this._layers[level - 1].length
+        ? this._layers[level - 1][index * 2 + 1]
+        : this._zeros[level - 1]
+      this._layers[level][index] = this._hashFn(left, right)
     }
   }
 
@@ -162,6 +177,7 @@ export default class MerkleTree {
       pathElements,
       pathIndices,
       pathPositions,
+      pathRoot: this.root,
     }
   }
 
@@ -184,9 +200,9 @@ export default class MerkleTree {
     return this.path(index)
   }
 
-  getTreeEdge(edgeElement: Element): TreeEdge {
-    const edgeIndex = this.indexOf(edgeElement)
-    if (edgeIndex <= -1) {
+  getTreeEdge(edgeIndex: number): TreeEdge {
+    const edgeElement = this._layers[0][edgeIndex]
+    if (!edgeElement) {
       throw new Error('Element not found')
     }
     const edgePath = this.path(edgeIndex)

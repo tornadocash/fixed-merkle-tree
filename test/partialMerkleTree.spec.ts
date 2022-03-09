@@ -7,15 +7,15 @@ import { createHash } from 'crypto'
 const sha256Hash = (left, right) => createHash('sha256').update(`${left}${right}`).digest('hex')
 
 describe('PartialMerkleTree', () => {
-  const getTestTrees = (levels: number, elements: Element[], edgeElement: Element, treeOptions: MerkleTreeOptions = {}) => {
+  const getTestTrees = (levels: number, elements: Element[], edgeIndex: number, treeOptions: MerkleTreeOptions = {}) => {
     const fullTree = new MerkleTree(levels, elements, treeOptions)
-    const edge = fullTree.getTreeEdge(edgeElement)
+    const edge = fullTree.getTreeEdge(edgeIndex)
     const leavesAfterEdge = elements.slice(edge.edgeIndex)
-    const partialTree = new PartialMerkleTree(levels, edge, leavesAfterEdge, fullTree.root, treeOptions)
+    const partialTree = new PartialMerkleTree(levels, edge, leavesAfterEdge, treeOptions)
     return { fullTree, partialTree }
   }
   describe('#constructor', () => {
-    const { fullTree, partialTree } = getTestTrees(20, ['0', '1', '2', '3', '4', '5'], '2')
+    const { fullTree, partialTree } = getTestTrees(20, ['0', '1', '2', '3', '4', '5'], 2)
     it('should initialize merkle tree with same root', () => {
       should().equal(fullTree.root, partialTree.root)
     })
@@ -25,7 +25,7 @@ describe('PartialMerkleTree', () => {
     })
 
     it('should work with optional hash function and zero element', () => {
-      const { partialTree, fullTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6], 4, {
+      const { partialTree, fullTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6], 3, {
         hashFunction: sha256Hash,
         zeroElement: 'zero',
       })
@@ -36,15 +36,15 @@ describe('PartialMerkleTree', () => {
   describe('#insert', () => {
 
     it('should have equal root to full tree after insertion ', () => {
-      const { fullTree, partialTree } = getTestTrees(10, ['0', '1', '2', '3', '4', '5', '6', '7'], '5')
+      const { fullTree, partialTree } = getTestTrees(10, ['0', '1', '2', '3', '4', '5', '6', '7'], 5)
       fullTree.insert('9')
       partialTree.insert('9')
       should().equal(fullTree.root, partialTree.root)
     })
 
     it('should fail to insert when tree is full', () => {
-      const { partialTree } = getTestTrees(3, ['0', '1', '2', '3', '4', '5', '6', '7', '8'], '5')
-      const call = () => partialTree.insert('9')
+      const { partialTree } = getTestTrees(3, ['0', '1', '2', '3', '4', '5', '6', '7'], 5)
+      const call = () => partialTree.insert('8')
       should().throw(call, 'Tree is full')
     })
   })
@@ -52,7 +52,7 @@ describe('PartialMerkleTree', () => {
   describe('#bulkInsert', () => {
 
     it('should work like full tree', () => {
-      const { fullTree, partialTree } = getTestTrees(20, [1, 2, 3, 4, 5], 3)
+      const { fullTree, partialTree } = getTestTrees(20, [1, 2, 3, 4, 5], 2)
       partialTree.bulkInsert([6, 7, 8])
       fullTree.bulkInsert([6, 7, 8])
       should().equal(fullTree.root, partialTree.root)
@@ -73,8 +73,8 @@ describe('PartialMerkleTree', () => {
       ]
       for (const initial of initialArray) {
         for (const inserted of insertedArray) {
-          const { partialTree: tree1 } = getTestTrees(10, initial, initial.length > 1 ? initial.length - 1 : initial.length)
-          const { partialTree: tree2 } = getTestTrees(10, initial, initial.length > 1 ? initial.length - 1 : initial.length)
+          const { partialTree: tree1 } = getTestTrees(10, initial, initial.length - 1)
+          const { partialTree: tree2 } = getTestTrees(10, initial, initial.length - 1)
           tree1.bulkInsert(inserted)
           for (const item of inserted) {
             tree2.insert(item)
@@ -85,20 +85,20 @@ describe('PartialMerkleTree', () => {
     }).timeout(10000)
 
     it('should fail to insert too many elements', () => {
-      const { partialTree } = getTestTrees(2, [1, 2, 3, 4], 3)
+      const { partialTree } = getTestTrees(2, [1, 2, 3, 4], 2)
       const call = () => partialTree.bulkInsert([5, 6, 7])
       should().throw(call, 'Tree is full')
     })
     it('should bypass empty elements', () => {
       const elements = [1, 2, 3, 4]
-      const { partialTree } = getTestTrees(2, elements, 3)
+      const { partialTree } = getTestTrees(2, elements, 2)
       partialTree.bulkInsert([])
       should().equal(partialTree.elements.length, elements.length, 'No elements inserted')
     })
   })
   describe('#update', () => {
     it('should update last element', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       partialTree.update(4, 42)
       fullTree.update(4, 42)
       should().equal(partialTree.root, fullTree.root)
@@ -106,28 +106,28 @@ describe('PartialMerkleTree', () => {
 
 
     it('should update odd element', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 3)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 2)
       partialTree.update(4, 42)
       fullTree.update(4, 42)
       should().equal(partialTree.root, fullTree.root)
     })
 
     it('should update even element', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 3)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 2)
       partialTree.update(3, 42)
       fullTree.update(3, 42)
       should().equal(partialTree.root, fullTree.root)
     })
 
     it('should update extra element', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       partialTree.update(5, 6)
       fullTree.update(5, 6)
       should().equal(fullTree.root, partialTree.root)
     })
 
     it('should fail to update incorrect index', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 4)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
       should().throw((() => partialTree.update(-1, 42)), 'Insert index out of bounds: -1')
       should().throw((() => partialTree.update(6, 42)), 'Insert index out of bounds: 6')
       should().throw((() => partialTree.update(2, 42)), 'Index 2 is below the edge: 3')
@@ -136,36 +136,36 @@ describe('PartialMerkleTree', () => {
     })
 
     it('should fail to update over capacity', () => {
-      const { partialTree } = getTestTrees(2, [1, 2, 3, 4], 2)
+      const { partialTree } = getTestTrees(2, [1, 2, 3, 4], 1)
       const call = () => partialTree.update(4, 42)
       should().throw(call, 'Insert index out of bounds: 4')
     })
   })
   describe('#indexOf', () => {
     it('should return same result as full tree', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 4)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8], 3)
       should().equal(partialTree.indexOf(5), fullTree.indexOf(5))
     })
 
     it('should find index', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       should().equal(partialTree.indexOf(3), 2)
     })
 
     it('should work with comparator', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       should().equal(partialTree.indexOf(4, (arg0, arg1) => arg0 === arg1), 3)
     })
 
     it('should return -1 for non existent element', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       should().equal(partialTree.indexOf(42), -1)
     })
   })
 
   describe('#proof', () => {
     it('should return proof for known leaf', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       assert.deepEqual(partialTree.proof(4), partialTree.path(3))
     })
   })
@@ -173,8 +173,8 @@ describe('PartialMerkleTree', () => {
   describe('#getters', () => {
     it('should return capacity', () => {
       const levels = 10
-      const capacity = levels ** 2
-      const { fullTree, partialTree } = getTestTrees(levels, [1, 2, 3, 4, 5], 3)
+      const capacity = 2 ** levels
+      const { fullTree, partialTree } = getTestTrees(levels, [1, 2, 3, 4, 5], 2)
       should().equal(fullTree.capacity, capacity)
       should().equal(partialTree.capacity, capacity)
     })
@@ -188,13 +188,13 @@ describe('PartialMerkleTree', () => {
     })
 
     it('should return copy of layers', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       const layers = partialTree.layers
       should().not.equal(layers, partialTree.layers)
     })
 
     it('should return copy of zeros', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 3)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
       const zeros = partialTree.zeros
       should().not.equal(zeros, partialTree.zeros)
     })
@@ -204,14 +204,14 @@ describe('PartialMerkleTree', () => {
 
     it('should return path for known nodes', () => {
       const levels = 20
-      const capacity = levels ** 2
-      const elements = Array.from({ length: capacity }, (_, i) => i)
+      const capacity = 2 ** levels
+      const elements = Array.from({ length: capacity / 2 }, (_, i) => i)
       const { fullTree, partialTree } = getTestTrees(levels, elements, 250)
       assert.deepEqual(fullTree.path(250), partialTree.path(250))
-    })
+    }).timeout(10000)
 
     it('should fail on incorrect index', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
       should().throw((() => partialTree.path(-1)), 'Index out of bounds: -1')
       should().throw((() => partialTree.path(10)), 'Index out of bounds: 10')
       // @ts-ignore
@@ -219,39 +219,38 @@ describe('PartialMerkleTree', () => {
     })
 
     it('should fail if index is below edge', () => {
-      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
       const call = () => partialTree.path(2)
       should().throw(call, 'Index 2 is below the edge: 4')
     })
   })
   describe('#shiftEdge', () => {
     it('should work', () => {
-      const levels = 20
-      const elements: Element[] = Array.from({ length: levels ** 2 }, (_, i) => i)
+      const levels = 10
+      const elements: Element[] = Array.from({ length: 20 ** 2 }, (_, i) => i)
       const tree = new MerkleTree(levels, elements)
       const edge1 = tree.getTreeEdge(200)
       const edge2 = tree.getTreeEdge(100)
-      const partialTree1 = new PartialMerkleTree(levels, edge1, elements.slice(edge1.edgeIndex), tree.root)
-      const partialTree2 = new PartialMerkleTree(levels, edge2, elements.slice(edge2.edgeIndex), tree.root)
-      partialTree1.shiftEdge(edge2, elements.slice(edge2.edgeIndex, partialTree1.edgeIndex))
-      assert.deepEqual(partialTree1.path(105), partialTree2.path(105))
+      const partialTree = new PartialMerkleTree(levels, edge1, elements.slice(edge1.edgeIndex))
+      partialTree.shiftEdge(edge2, elements.slice(edge2.edgeIndex, partialTree.edgeIndex))
+      assert.deepEqual(partialTree.path(110), tree.path(110))
     })
     it('should fail if new edge index is over current edge', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
-      const newEdge = fullTree.getTreeEdge(6)
+      const { fullTree, partialTree } = getTestTrees(10, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
+      const newEdge = fullTree.getTreeEdge(4)
       const call = () => partialTree.shiftEdge(newEdge, [1, 2])
       should().throw(call, 'New edgeIndex should be smaller then 4')
     })
     it('should fail if elements length are incorrect', () => {
-      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
-      const newEdge = fullTree.getTreeEdge(4)
+      const { fullTree, partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
+      const newEdge = fullTree.getTreeEdge(3)
       const call = () => partialTree.shiftEdge(newEdge, [1, 2])
-      should().throw(call, 'Elements length should be 2')
+      should().throw(call, 'Elements length should be 1')
     })
   })
   describe('#serialize', () => {
     it('should work', () => {
-      const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6)
+      const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       const data = partialTree.serialize()
       const dst = PartialMerkleTree.deserialize(data)
       should().equal(partialTree.root, dst.root)
@@ -264,7 +263,7 @@ describe('PartialMerkleTree', () => {
   })
   describe('#toString', () => {
     it('should return correct stringified representation', () => {
-      const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6)
+      const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       const str = partialTree.toString()
       const dst = PartialMerkleTree.deserialize(JSON.parse(str))
       should().equal(partialTree.root, dst.root)

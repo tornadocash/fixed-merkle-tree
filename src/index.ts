@@ -32,11 +32,12 @@ export type ProofPath = {
   pathElements: Element[],
   pathIndices: number[],
   pathPositions: number[],
+  pathRoot: Element
 }
 export type TreeEdge = {
   edgeElement: Element;
   edgePath: ProofPath;
-  edgeIndex: number
+  edgeIndex: number;
 }
 export type LeafWithIndex = { index: number, data: Element }
 

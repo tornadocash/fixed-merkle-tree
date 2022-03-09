@@ -1,9 +1,12 @@
 import { MerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
+import { mimcsponge } from 'circomlib'
 import { createHash } from 'crypto'
 import { it } from 'mocha'
 
 const sha256Hash = (left, right) => createHash('sha256').update(`${left}${right}`).digest('hex')
+const mimcHash = (left, right) => mimcsponge.multiHash([BigInt(left), BigInt(right)]).toString()
+const ZERO_ELEMENT = '21663839004416932945382355908790599225266501822907911457504978515578255421292'
 
 describe('MerkleTree', () => {
 
@@ -41,6 +44,11 @@ describe('MerkleTree', () => {
     it('should work with optional hash function and zero element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5, 6], { hashFunction: sha256Hash, zeroElement: 'zero' })
       should().equal(tree.root, 'a377b9fa0ed41add83e56f7e1d0e2ebdb46550b9d8b26b77dece60cb67283f19')
+    })
+
+    it('should work with mimc hash function and zero element', () => {
+      const tree = new MerkleTree(10, [1, 2, 3], { hashFunction: mimcHash, zeroElement: ZERO_ELEMENT })
+      should().equal(tree.root, '13605252518346649016266481317890801910232739395710162921320863289825142055129')
     })
   })
 
@@ -232,11 +240,13 @@ describe('MerkleTree', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4])
       should().throw((() => tree.path(-1)), 'Index out of bounds: -1')
       should().throw((() => tree.path(5)), 'Index out of bounds: 5')
+      // @ts-ignore
       should().throw((() => tree.path('qwe')), 'Index out of bounds: qwe')
     })
 
     it('should work for correct string index', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
+      // @ts-ignore
       const path = tree.path('2')
       assert.deepEqual(path.pathIndices, [0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
       assert.deepEqual(path.pathElements, [
@@ -273,6 +283,7 @@ describe('MerkleTree', () => {
           ],
           pathIndices: [0, 0, 1, 0],
           pathPositions: [5, 0, 0, 0],
+          pathRoot: '3283298202329284319899364273680487022592',
         },
         edgeElement: 4,
         edgeIndex: 4,
