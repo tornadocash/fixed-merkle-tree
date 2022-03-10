@@ -195,17 +195,21 @@ export default class MerkleTree {
     return { edgePath, edgeElement, edgeIndex }
   }
 
-  getTreeSlices(count: number): { edge: TreeEdge, elements: Element[] }[] {
+  /**
+   * 🪓
+   * @param count
+   */
+  getTreeSlices(count = 4): { edge: TreeEdge, elements: Element[] }[] {
     const length = this._layers[0].length
     let size = Math.ceil(length / count)
     size % 2 && size++
-    const indexes = []
+    const slices = []
     for (let i = length - size - 1; i > -size; i -= size) {
       const edgeLeft = i >= 0 ? i : 0
       const edgeRight = i + size
-      indexes.push({ edge: this.getTreeEdge(edgeLeft), elements: this.elements.slice(edgeLeft, edgeRight) })
+      slices.push({ edge: this.getTreeEdge(edgeLeft), elements: this.elements.slice(edgeLeft, edgeRight) })
     }
-    return indexes
+    return slices.reverse()
   }
 
   /**
