@@ -188,11 +188,24 @@ export default class MerkleTree {
 
   getTreeEdge(edgeIndex: number): TreeEdge {
     const edgeElement = this._layers[0][edgeIndex]
-    if (!edgeElement) {
+    if (edgeElement === undefined) {
       throw new Error('Element not found')
     }
     const edgePath = this.path(edgeIndex)
     return { edgePath, edgeElement, edgeIndex }
+  }
+
+  getTreeSlices(count: number): { edge: TreeEdge, elements: Element[] }[] {
+    const length = this._layers[0].length
+    let size = Math.ceil(length / count)
+    size % 2 && size++
+    const indexes = []
+    for (let i = length - size - 1; i > -size; i -= size) {
+      const edgeLeft = i >= 0 ? i : 0
+      const edgeRight = i + size
+      indexes.push({ edge: this.getTreeEdge(edgeLeft), elements: this.elements.slice(edgeLeft, edgeRight) })
+    }
+    return indexes
   }
 
   /**
