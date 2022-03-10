@@ -203,12 +203,12 @@ describe('PartialMerkleTree', () => {
   describe('#path', () => {
 
     it('should return path for known nodes', () => {
-      const levels = 20
+      const levels = 10
       const capacity = 2 ** levels
       const elements = Array.from({ length: capacity / 2 }, (_, i) => i)
       const { fullTree, partialTree } = getTestTrees(levels, elements, 250)
-      assert.deepEqual(fullTree.path(250), partialTree.path(250))
-    }).timeout(10000)
+      assert.deepEqual(fullTree.path(251), partialTree.path(251))
+    }).timeout(1000)
 
     it('should fail on incorrect index', () => {
       const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5, 6, 7, 8, 9], 4)

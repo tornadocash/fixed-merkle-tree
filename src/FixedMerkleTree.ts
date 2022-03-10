@@ -65,20 +65,6 @@ export default class MerkleTree {
     }
   }
 
-  // _buildHashes2(nodes: Element[]) {
-  //   let layerIndex = 0
-  //   while (layerIndex < this.levels) {
-  //     layerIndex = this._layers.length
-  //     this._layers[layerIndex] = []
-  //     for (let i = 0; i < nodes.length; i += 2) {
-  //       const left = nodes[i]
-  //       const right = (i + 1 === nodes.length && nodes.length % 2 === 1) ? this._zeros[layerIndex - 1] : nodes[i + 1]
-  //       this._layers[layerIndex].push(this._hashFn(left, right))
-  //     }
-  //     nodes = this._layers[layerIndex]
-  //   }
-  // }
-
   /**
    * Get tree root
    */
