@@ -1,16 +1,20 @@
 import { MerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
-import { mimcsponge } from 'circomlib'
+import { buildMimcSponge } from 'circomlibjs'
 import { createHash } from 'crypto'
 import { it } from 'mocha'
 
 const sha256Hash = (left, right) => createHash('sha256').update(`${left}${right}`).digest('hex')
-const mimcHash = (left, right) => mimcsponge.multiHash([BigInt(left), BigInt(right)]).toString()
 const ZERO_ELEMENT = '21663839004416932945382355908790599225266501822907911457504978515578255421292'
 
 describe('MerkleTree', () => {
 
   describe('#constructor', () => {
+    let mimcSponge
+
+    before(async () => {
+      mimcSponge = await buildMimcSponge()
+    })
 
     it('should have correct zero root', () => {
       const tree = new MerkleTree(10, [])
@@ -47,6 +51,7 @@ describe('MerkleTree', () => {
     })
 
     it('should work with mimc hash function and zero element', () => {
+      const mimcHash = (left, right) => mimcSponge.F.toString(mimcSponge.multiHash([BigInt(left), BigInt(right)]))
       const tree = new MerkleTree(10, [1, 2, 3], { hashFunction: mimcHash, zeroElement: ZERO_ELEMENT })
       should().equal(tree.root, '13605252518346649016266481317890801910232739395710162921320863289825142055129')
     })
