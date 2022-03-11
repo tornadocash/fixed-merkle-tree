@@ -204,12 +204,12 @@ export default class MerkleTree {
     let size = Math.ceil(length / count)
     size % 2 && size++
     const slices = []
-    for (let i = length - size - 1; i > -size; i -= size) {
-      const edgeLeft = i >= 0 ? i : 0
+    for (let i = 0; i < length; i += size) {
+      const edgeLeft = i
       const edgeRight = i + size
       slices.push({ edge: this.getTreeEdge(edgeLeft), elements: this.elements.slice(edgeLeft, edgeRight) })
     }
-    return slices.reverse()
+    return slices
   }
 
   /**
