@@ -192,7 +192,7 @@ export default class MerkleTree {
       throw new Error('Element not found')
     }
     const edgePath = this.path(edgeIndex)
-    return { edgePath, edgeElement, edgeIndex }
+    return { edgePath, edgeElement, edgeIndex, edgeElementsCount: this._layers[0].length }
   }
 
   /**
@@ -202,7 +202,7 @@ export default class MerkleTree {
   getTreeSlices(count = 4): { edge: TreeEdge, elements: Element[] }[] {
     const length = this._layers[0].length
     let size = Math.ceil(length / count)
-    size % 2 && size++
+    if (size % 2) size++
     const slices = []
     for (let i = 0; i < length; i += size) {
       const edgeLeft = i

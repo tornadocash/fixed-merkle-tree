@@ -20,11 +20,11 @@ export type SerializedTreeState = {
 }
 
 export type SerializedPartialTreeState = {
-  levels: number,
+  levels: number
   leaves: Element[]
-  _zeros: Array<Element>,
-  _edgeLeafProof: ProofPath,
-  _initialRoot: Element,
+  _edgeElementsCount: number
+  _zeros: Array<Element>
+  _edgeLeafProof: ProofPath
   _edgeLeaf: LeafWithIndex
 }
 
@@ -38,6 +38,7 @@ export type TreeEdge = {
   edgeElement: Element;
   edgePath: ProofPath;
   edgeIndex: number;
+  edgeElementsCount: number;
 }
 export type LeafWithIndex = { index: number, data: Element }
 

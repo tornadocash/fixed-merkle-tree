@@ -1,4 +1,4 @@
-import { MerkleTree, TreeEdge } from '../src'
+import { MerkleTree, PartialMerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
 import { buildMimcSponge } from 'circomlibjs'
 import { createHash } from 'crypto'
@@ -292,6 +292,7 @@ describe('MerkleTree', () => {
         },
         edgeElement: 4,
         edgeIndex: 4,
+        edgeElementsCount: 6,
       }
       const tree = new MerkleTree(4, [0, 1, 2, 3, 4, 5])
       assert.deepEqual(tree.getTreeEdge(4), expectedEdge)
@@ -302,7 +303,38 @@ describe('MerkleTree', () => {
       should().throw(call, 'Element not found')
     })
   })
+  describe('#getTreeSlices', () => {
+    let fullTree: MerkleTree
+    before(() => {
+      const elements = Array.from({ length: 128 }, (_, i) => i)
+      fullTree = new MerkleTree(10, elements)
+    })
+    it('should return correct slices count', () => {
+      const count = 5
+      const slicesCount = fullTree.getTreeSlices(5).length
+      should().equal(count, slicesCount)
+    })
 
+    it('should be able to create partial tree from last slice', () => {
+      const lastSlice = fullTree.getTreeSlices().pop()
+      const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
+      should().equal(partialTree.root, fullTree.root)
+    })
+
+    it('should be able to build full tree from slices', () => {
+      const slices = fullTree.getTreeSlices()
+      const lastSlice = slices.pop()
+      const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
+      slices.reverse().forEach(({ edge, elements }) => partialTree.shiftEdge(edge, elements))
+      assert.deepEqual(partialTree.layers, fullTree.layers)
+    })
+
+    it('should throw if invalid number of elements', () => {
+      const [firstSlice] = fullTree.getTreeSlices()
+      const call = () => new PartialMerkleTree(10, firstSlice.edge, firstSlice.elements)
+      should().throw(call, 'Invalid number of elements')
+    })
+  })
   describe('#getters', () => {
     const elements = [1, 2, 3, 4, 5]
     const layers = [

@@ -32,16 +32,16 @@ export class PartialMerkleTree {
     edgePath,
     edgeElement,
     edgeIndex,
+    edgeElementsCount,
   }: TreeEdge, leaves: Element[], { hashFunction, zeroElement }: MerkleTreeOptions = {}) {
-    hashFunction = hashFunction || defaultHash
-    const hashFn = (left, right) => (left !== undefined && right !== undefined) ? hashFunction(left, right) : undefined
+    if (edgeIndex + leaves.length !== edgeElementsCount) throw new Error('Invalid number of elements')
     this._edgeLeafProof = edgePath
     this._initialRoot = edgePath.pathRoot
     this.zeroElement = zeroElement ?? 0
     this._edgeLeaf = { data: edgeElement, index: edgeIndex }
     this._leavesAfterEdge = leaves
     this.levels = levels
-    this._hashFn = hashFn
+    this._hashFn = hashFunction || defaultHash
     this._createProofMap()
     this._buildTree()
   }
@@ -257,9 +257,9 @@ export class PartialMerkleTree {
   serialize(): SerializedPartialTreeState {
     const leaves = this.layers[0].slice(this._edgeLeaf.index)
     return {
-      _initialRoot: this._initialRoot,
       _edgeLeafProof: this._edgeLeafProof,
       _edgeLeaf: this._edgeLeaf,
+      _edgeElementsCount: this._layers[0].length,
       levels: this.levels,
       leaves,
       _zeros: this._zeros,
@@ -271,6 +271,7 @@ export class PartialMerkleTree {
       edgePath: data._edgeLeafProof,
       edgeElement: data._edgeLeaf.data,
       edgeIndex: data._edgeLeaf.index,
+      edgeElementsCount: data._edgeElementsCount,
     }
     return new PartialMerkleTree(data.levels, edge, data.leaves, {
       hashFunction,
