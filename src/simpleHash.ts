@@ -1,3 +1,5 @@
+import { Element } from './index'
+
 /***
  * This is insecure hash function, just for example only
  * @param data
@@ -17,3 +19,4 @@ export function simpleHash<T>(data: T[], seed?: number, hashLength = 40): string
   return BigInt('0x' + hash.padEnd(hashLength - (hash.length - 1), '0')).toString(10)
 }
 
+export default (left: Element, right: Element): string => simpleHash([left, right])
