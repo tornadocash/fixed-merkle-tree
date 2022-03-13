@@ -1,4 +1,13 @@
-import { Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, simpleHash, TreeEdge } from './'
+import {
+  Element,
+  HashFunction,
+  MerkleTreeOptions,
+  ProofPath,
+  SerializedTreeState,
+  simpleHash,
+  TreeEdge,
+  TreeSlice,
+} from './'
 
 const defaultHash = (left: Element, right: Element): string => simpleHash([left, right])
 
@@ -199,11 +208,11 @@ export default class MerkleTree {
    * 🪓
    * @param count
    */
-  getTreeSlices(count = 4): { edge: TreeEdge, elements: Element[] }[] {
+  getTreeSlices(count = 4): TreeSlice[] {
     const length = this._layers[0].length
     let size = Math.ceil(length / count)
     if (size % 2) size++
-    const slices = []
+    const slices: TreeSlice[] = []
     for (let i = 0; i < length; i += size) {
       const edgeLeft = i
       const edgeRight = i + size

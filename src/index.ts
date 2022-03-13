@@ -40,5 +40,7 @@ export type TreeEdge = {
   edgeIndex: number;
   edgeElementsCount: number;
 }
+
+export type TreeSlice = { edge: TreeEdge, elements: Element[] }
 export type LeafWithIndex = { index: number, data: Element }
 

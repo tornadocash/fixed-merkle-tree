@@ -198,6 +198,11 @@ describe('PartialMerkleTree', () => {
       const zeros = partialTree.zeros
       should().not.equal(zeros, partialTree.zeros)
     })
+
+    it('should return edge leaf', () => {
+      const { partialTree } = getTestTrees(10, [1, 2, 3, 4, 5], 2)
+      should().equal(partialTree.edgeElement, 3)
+    })
   })
 
   describe('#path', () => {
