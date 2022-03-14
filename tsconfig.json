@@ -3,7 +3,7 @@
     "lib": [
       "es2019"
     ],
-    "target": "es6",
+    "target": "es2017",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "./lib",
@@ -12,10 +12,11 @@
     "esModuleInterop": true,
     "sourceMap": false,
     "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true
   },
   "include": [
-    "src/*"
+    "src"
   ],
   "exclude": [
     "node_modules",
