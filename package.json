@@ -8,7 +8,7 @@
   "scripts": {
     "test": "ts-mocha 'test/*.spec.ts' -s 10",
     "coverage": "nyc npm run test",
-    "build": "npx tsc",
+    "build": "tsc",
     "clean": "rm -rf lib/",
     "prepare": "npm run clean && npm run build",
     "lint": "eslint src"
@@ -29,12 +29,12 @@
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "chai": "^4.2.0",
+    "circomlibjs": "^0.1.1",
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
+    "mocha": "^9.2.2",
     "nyc": "^15.1.0",
-    "mocha": "^9.2.1",
     "ts-mocha": "^9.0.2",
-    "typescript": "^4.5.5",
-    "circomlibjs": "^0.1.1"
+    "typescript": "^4.6.2"
   }
 }
