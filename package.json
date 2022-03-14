@@ -5,14 +5,10 @@
   "repository": "https://github.com/tornadocash/fixed-merkle-tree.git",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "engines": {
-    "node": "14.17",
-    "npm": "6"
-  },
   "scripts": {
     "test": "ts-mocha 'test/*.spec.ts' -s 10",
     "coverage": "nyc npm run test",
-    "build": "tsc",
+    "build": "npx tsc",
     "clean": "rm -rf lib/",
     "prepare": "npm run clean && npm run build",
     "lint": "eslint src"
