@@ -21,7 +21,8 @@
   "author": "Roman Semenov <semenov.roma@gmail.com>",
   "license": "ISC",
   "files": [
-    "src/*"
+    "src/*",
+    "lib/*"
   ],
   "devDependencies": {
     "@types/expect": "^24.3.0",
