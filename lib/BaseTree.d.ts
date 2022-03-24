@@ -1,4 +1,4 @@
-import { Element, HashFunction, ProofPath } from './index';
+import { Element, HashFunction, ProofPath } from './';
 export declare class BaseTree {
     levels: number;
     protected _hashFn: HashFunction<Element>;

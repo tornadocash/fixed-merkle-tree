@@ -1,7 +1,8 @@
-export { default as MerkleTree } from './FixedMerkleTree'
+import { default as MerkleTree } from './FixedMerkleTree'
 export { PartialMerkleTree } from './PartialMerkleTree'
 export { simpleHash } from './simpleHash'
-
+export { MerkleTree }
+export default MerkleTree
 export type HashFunction<T> = {
   (left: T, right: T): string
 }

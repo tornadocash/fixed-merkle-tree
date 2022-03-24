@@ -1,6 +1,6 @@
-import { simpleHash } from '../src'
 import { it } from 'mocha'
 import { should } from 'chai'
+import { simpleHash } from '../src'
 
 describe('SimpleHash', () => {
   it('should return correct hash string with default params', () => {

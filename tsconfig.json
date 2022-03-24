@@ -8,7 +8,6 @@
     "moduleResolution": "Node",
     "outDir": "./lib",
     "rootDir": "./src",
-    "composite": true,
     "esModuleInterop": true,
     "sourceMap": false,
     "allowSyntheticDefaultImports": true,

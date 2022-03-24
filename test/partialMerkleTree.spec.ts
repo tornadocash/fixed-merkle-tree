@@ -180,8 +180,8 @@ describe('PartialMerkleTree', () => {
     })
 
     it('should return same elements count as full tree', () => {
-      const levels = 20
-      const capacity = levels ** 2
+      const levels = 10
+      const capacity = 2 ** levels
       const elements = Array.from({ length: capacity }, (_, i) => i)
       const { fullTree, partialTree } = getTestTrees(levels, elements, 200)
       should().equal(partialTree.elements.length, fullTree.elements.length)
@@ -232,13 +232,17 @@ describe('PartialMerkleTree', () => {
   describe('#shiftEdge', () => {
     it('should work', () => {
       const levels = 10
-      const elements: Element[] = Array.from({ length: 20 ** 2 }, (_, i) => i)
+      const elements: Element[] = Array.from({ length: 21 ** 2 }, (_, i) => i)
       const tree = new MerkleTree(levels, elements)
       const edge1 = tree.getTreeEdge(200)
       const edge2 = tree.getTreeEdge(100)
+      const edge3 = tree.getTreeEdge(10)
       const partialTree = new PartialMerkleTree(levels, edge1, elements.slice(edge1.edgeIndex))
       partialTree.shiftEdge(edge2, elements.slice(edge2.edgeIndex, partialTree.edgeIndex))
-      assert.deepEqual(partialTree.path(110), tree.path(110))
+      partialTree.shiftEdge(edge3, elements.slice(edge3.edgeIndex, partialTree.edgeIndex))
+      tree.insert('1111')
+      partialTree.insert('1111')
+      assert.deepEqual(partialTree.path(50), tree.path(50))
     })
     it('should fail if new edge index is over current edge', () => {
       const { fullTree, partialTree } = getTestTrees(10, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 4)

@@ -1,4 +1,4 @@
-import { Element } from './index'
+import { Element } from './'
 
 /***
  * This is insecure hash function, just for example only

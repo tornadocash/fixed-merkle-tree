@@ -114,7 +114,7 @@ export class PartialMerkleTree extends BaseTree {
       const leafIndex = elIndex ^ 1
       if (leafIndex < this._layers[level].length) {
         const [proofPos, proofEl] = this._proofMap.get(level)
-        pathElements[level] = proofPos === leafIndex ? proofEl : this._layers[level][leafIndex]
+        pathElements[level] = this._layers[level][leafIndex] || (proofPos === leafIndex ? proofEl : null)
         pathPositions[level] = leafIndex
       } else {
         pathElements[level] = this._zeros[level]

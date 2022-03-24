@@ -1,6 +1,5 @@
 import { MerkleTree, PartialMerkleTree, TreeEdge } from '../src'
 import { assert, should } from 'chai'
-import { buildMimcSponge } from 'circomlibjs'
 import { createHash } from 'crypto'
 import { it } from 'mocha'
 
@@ -10,11 +9,6 @@ const ZERO_ELEMENT = '2166383900441693294538235590879059922526650182290791145750
 describe('MerkleTree', () => {
 
   describe('#constructor', () => {
-    let mimcSponge
-
-    before(async () => {
-      mimcSponge = await buildMimcSponge()
-    })
 
     it('should have correct zero root', () => {
       const tree = new MerkleTree(10, [])
@@ -48,12 +42,6 @@ describe('MerkleTree', () => {
     it('should work with optional hash function and zero element', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5, 6], { hashFunction: sha256Hash, zeroElement: 'zero' })
       should().equal(tree.root, 'a377b9fa0ed41add83e56f7e1d0e2ebdb46550b9d8b26b77dece60cb67283f19')
-    })
-
-    it('should work with mimc hash function and zero element', () => {
-      const mimcHash = (left, right) => mimcSponge.F.toString(mimcSponge.multiHash([BigInt(left), BigInt(right)]))
-      const tree = new MerkleTree(10, [1, 2, 3], { hashFunction: mimcHash, zeroElement: ZERO_ELEMENT })
-      should().equal(tree.root, '13605252518346649016266481317890801910232739395710162921320863289825142055129')
     })
   })
 
@@ -305,35 +293,39 @@ describe('MerkleTree', () => {
   })
   describe('#getTreeSlices', () => {
     let fullTree: MerkleTree
-    before(() => {
-      const elements = Array.from({ length: 128 }, (_, i) => i)
+    before(async () => {
+      const elements = Array.from({ length: 2 ** 8 + 11 }, (_, i) => i)
       fullTree = new MerkleTree(10, elements)
+      return Promise.resolve()
     })
     it('should return correct slices count', () => {
-      const count = 5
-      const slicesCount = fullTree.getTreeSlices(5).length
+      const count = 4
+      const slicesCount = fullTree.getTreeSlices(4).length
       should().equal(count, slicesCount)
-    })
+    }).timeout(10000)
 
     it('should be able to create partial tree from last slice', () => {
-      const lastSlice = fullTree.getTreeSlices().pop()
+      const [, , , lastSlice] = fullTree.getTreeSlices()
       const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
-      should().equal(partialTree.root, fullTree.root)
-    })
+      assert.deepEqual(fullTree.root, partialTree.root)
+    }).timeout(10000)
 
     it('should be able to build full tree from slices', () => {
       const slices = fullTree.getTreeSlices()
       const lastSlice = slices.pop()
       const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
-      slices.reverse().forEach(({ edge, elements }) => partialTree.shiftEdge(edge, elements))
-      assert.deepEqual(partialTree.layers, fullTree.layers)
-    })
+      slices.reverse().forEach(({ edge, elements }) => {
+        console.log(edge.edgeIndex, elements.length)
+        partialTree.shiftEdge(edge, elements)
+      })
+      assert.deepEqual(fullTree.layers, partialTree.layers)
+    }).timeout(10000)
 
     it('should throw if invalid number of elements', () => {
       const [firstSlice] = fullTree.getTreeSlices()
       const call = () => new PartialMerkleTree(10, firstSlice.edge, firstSlice.elements)
       should().throw(call, 'Invalid number of elements')
-    })
+    }).timeout(10000)
   })
   describe('#getters', () => {
     const elements = [1, 2, 3, 4, 5]
