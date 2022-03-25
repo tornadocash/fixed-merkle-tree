@@ -294,7 +294,7 @@ describe('MerkleTree', () => {
   describe('#getTreeSlices', () => {
     let fullTree: MerkleTree
     before(async () => {
-      const elements = Array.from({ length: 2 ** 8 + 11 }, (_, i) => i)
+      const elements = Array.from({ length: 2 ** 10 }, (_, i) => i)
       fullTree = new MerkleTree(10, elements)
       return Promise.resolve()
     })
@@ -315,10 +315,19 @@ describe('MerkleTree', () => {
       const lastSlice = slices.pop()
       const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
       slices.reverse().forEach(({ edge, elements }) => {
-        console.log(edge.edgeIndex, elements.length)
         partialTree.shiftEdge(edge, elements)
       })
       assert.deepEqual(fullTree.layers, partialTree.layers)
+    }).timeout(10000)
+
+    it('should return same path', () => {
+      const slices = fullTree.getTreeSlices()
+      const lastSlice = slices.pop()
+      const partialTree = new PartialMerkleTree(10, lastSlice.edge, lastSlice.elements)
+      slices.reverse().forEach(({ edge, elements }) => {
+        partialTree.shiftEdge(edge, elements)
+      })
+      assert.deepEqual(fullTree.path(100), partialTree.path(100))
     }).timeout(10000)
 
     it('should throw if invalid number of elements', () => {

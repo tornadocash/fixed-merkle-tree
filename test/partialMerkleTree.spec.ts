@@ -230,20 +230,30 @@ describe('PartialMerkleTree', () => {
     })
   })
   describe('#shiftEdge', () => {
+    const levels = 20
+    const elements: Element[] = Array.from({ length: 2 ** 18 }, (_, i) => i)
+    const tree = new MerkleTree(levels, elements)
     it('should work', () => {
-      const levels = 10
-      const elements: Element[] = Array.from({ length: 21 ** 2 }, (_, i) => i)
-      const tree = new MerkleTree(levels, elements)
       const edge1 = tree.getTreeEdge(200)
       const edge2 = tree.getTreeEdge(100)
-      const edge3 = tree.getTreeEdge(10)
       const partialTree = new PartialMerkleTree(levels, edge1, elements.slice(edge1.edgeIndex))
       partialTree.shiftEdge(edge2, elements.slice(edge2.edgeIndex, partialTree.edgeIndex))
-      partialTree.shiftEdge(edge3, elements.slice(edge3.edgeIndex, partialTree.edgeIndex))
       tree.insert('1111')
       partialTree.insert('1111')
-      assert.deepEqual(partialTree.path(50), tree.path(50))
+      assert.deepEqual(partialTree.path(150), tree.path(150))
     })
+    it('should be able to build full tree from slices', () => {
+      const slices = tree.getTreeSlices(6)
+      const lastSlice = slices.pop()
+      const partialTree = new PartialMerkleTree(levels, lastSlice.edge, lastSlice.elements)
+      for (let i = slices.length - 1; i >= 0; i--) {
+        partialTree.shiftEdge(slices[i].edge, slices[i].elements)
+      }
+      partialTree.insert('1')
+      tree.insert('1')
+      assert.deepStrictEqual(partialTree.path(432), tree.path(432))
+    }).timeout(10000)
+
     it('should fail if new edge index is over current edge', () => {
       const { fullTree, partialTree } = getTestTrees(10, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 4)
       const newEdge = fullTree.getTreeEdge(4)
