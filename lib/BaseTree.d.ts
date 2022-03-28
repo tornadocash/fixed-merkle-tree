@@ -12,11 +12,13 @@ export declare class BaseTree {
     get root(): Element;
     /**
      * Find an element in the tree
+     * @param elements elements of tree
      * @param element An element to find
      * @param comparator A function that checks leaf value equality
+     * @param fromIndex The index to start the search at. If the index is greater than or equal to the array's length, -1 is returned
      * @returns {number} Index if element is found, otherwise -1
      */
-    indexOf(element: Element, comparator?: <T>(arg0: T, arg1: T) => boolean): number;
+    static indexOf(elements: Element[], element: Element, fromIndex?: number, comparator?: <T>(arg0: T, arg1: T) => boolean): number;
     /**
      * Insert new element into the tree
      * @param element Element to insert
@@ -29,7 +31,6 @@ export declare class BaseTree {
      * @param element Updated element value
      */
     update(index: number, element: Element): void;
-    proof(element: Element): ProofPath;
     /**
      * Get merkle path to a leaf
      * @param {number} index Leaf index to generate path for

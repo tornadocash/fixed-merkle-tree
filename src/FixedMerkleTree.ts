@@ -1,4 +1,4 @@
-import { Element, HashFunction, MerkleTreeOptions, SerializedTreeState, TreeEdge, TreeSlice } from './'
+import { Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge, TreeSlice } from './'
 import defaultHash from './simpleHash'
 import { BaseTree } from './BaseTree'
 
@@ -59,6 +59,15 @@ export default class MerkleTree extends BaseTree {
       }
     }
     this.insert(elements[elements.length - 1])
+  }
+
+  indexOf(element: Element, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
+    return BaseTree.indexOf(this._layers[0], element, 0, comparator)
+  }
+
+  proof(element: Element): ProofPath {
+    const index = this.indexOf(element)
+    return this.path(index)
   }
 
   getTreeEdge(edgeIndex: number): TreeEdge {

@@ -29,15 +29,17 @@ export class BaseTree {
 
   /**
    * Find an element in the tree
+   * @param elements elements of tree
    * @param element An element to find
    * @param comparator A function that checks leaf value equality
+   * @param fromIndex The index to start the search at. If the index is greater than or equal to the array's length, -1 is returned
    * @returns {number} Index if element is found, otherwise -1
    */
-  indexOf(element: Element, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
+  static indexOf(elements: Element[], element: Element, fromIndex?: number, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
     if (comparator) {
-      return this._layers[0].findIndex((el) => comparator<Element>(element, el))
+      return elements.findIndex((el) => comparator<Element>(element, el))
     } else {
-      return this._layers[0].indexOf(element)
+      return elements.indexOf(element, fromIndex)
     }
   }
 
@@ -94,11 +96,6 @@ export class BaseTree {
     }
     this._layers[0][index] = element
     this._processUpdate(index)
-  }
-
-  proof(element: Element): ProofPath {
-    const index = this.indexOf(element)
-    return this.path(index)
   }
 
   /**

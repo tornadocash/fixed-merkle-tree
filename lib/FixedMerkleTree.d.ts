@@ -1,4 +1,4 @@
-import { Element, HashFunction, MerkleTreeOptions, SerializedTreeState, TreeEdge, TreeSlice } from './';
+import { Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge, TreeSlice } from './';
 import { BaseTree } from './BaseTree';
 export default class MerkleTree extends BaseTree {
     constructor(levels: number, elements?: Element[], { hashFunction, zeroElement, }?: MerkleTreeOptions);
@@ -8,6 +8,8 @@ export default class MerkleTree extends BaseTree {
      * @param {Array} elements Elements to insert
      */
     bulkInsert(elements: Element[]): void;
+    indexOf(element: Element, comparator?: <T>(arg0: T, arg1: T) => boolean): number;
+    proof(element: Element): ProofPath;
     getTreeEdge(edgeIndex: number): TreeEdge;
     /**
      * 🪓

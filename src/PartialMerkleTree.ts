@@ -131,6 +131,14 @@ export class PartialMerkleTree extends BaseTree {
     }
   }
 
+  indexOf(element: Element, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
+    return BaseTree.indexOf(this._layers[0], element, this.edgeIndex, comparator)
+  }
+
+  proof(element: Element): ProofPath {
+    const index = this.indexOf(element)
+    return this.path(index)
+  }
 
   /**
    * Shifts edge of tree to left

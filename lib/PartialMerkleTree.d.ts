@@ -21,6 +21,8 @@ export declare class PartialMerkleTree extends BaseTree {
      */
     update(index: number, element: Element): void;
     path(index: number): ProofPath;
+    indexOf(element: Element, comparator?: <T>(arg0: T, arg1: T) => boolean): number;
+    proof(element: Element): ProofPath;
     /**
      * Shifts edge of tree to left
      * @param edge new TreeEdge below current edge
