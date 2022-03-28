@@ -113,13 +113,14 @@ export class PartialMerkleTree extends BaseTree {
       pathIndices[level] = elIndex % 2
       const leafIndex = elIndex ^ 1
       if (leafIndex < this._layers[level].length) {
-        const [proofPos, proofEl] = this._proofMap.get(level)
-        pathElements[level] = this._layers[level][leafIndex] ?? (proofPos === leafIndex ? proofEl : null)
+        pathElements[level] = this._layers[level][leafIndex]
         pathPositions[level] = leafIndex
       } else {
         pathElements[level] = this._zeros[level]
         pathPositions[level] = 0
       }
+      const [proofPos, proofEl] = this._proofMap.get(level)
+      pathElements[level] = pathElements[level] ?? (proofPos === leafIndex ? proofEl : this._zeros[level])
       elIndex >>= 1
     }
     return {
@@ -152,28 +153,23 @@ export class PartialMerkleTree extends BaseTree {
   }
 
   serialize(): SerializedPartialTreeState {
-    const leaves = this.layers[0].slice(this._edgeLeaf.index)
     return {
       _edgeLeafProof: this._edgeLeafProof,
       _edgeLeaf: this._edgeLeaf,
-      _edgeElementsCount: this._layers[0].length,
-      levels: this.levels,
-      leaves,
+      _layers: this._layers,
       _zeros: this._zeros,
+      levels: this.levels,
     }
   }
 
   static deserialize(data: SerializedPartialTreeState, hashFunction?: HashFunction<Element>): PartialMerkleTree {
-    const edge: TreeEdge = {
-      edgePath: data._edgeLeafProof,
-      edgeElement: data._edgeLeaf.data,
-      edgeIndex: data._edgeLeaf.index,
-      edgeElementsCount: data._edgeElementsCount,
-    }
-    return new PartialMerkleTree(data.levels, edge, data.leaves, {
-      hashFunction,
-      zeroElement: data._zeros[0],
-    })
+    const instance: PartialMerkleTree = Object.assign(Object.create(this.prototype), data)
+    instance._hashFn = hashFunction || defaultHash
+    instance._initialRoot = data._edgeLeafProof.pathRoot
+    instance.zeroElement = instance._zeros[0]
+    instance._leavesAfterEdge = instance._layers[0].slice(data._edgeLeaf.index)
+    instance._createProofMap()
+    return instance
   }
 
   toString() {

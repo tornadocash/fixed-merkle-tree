@@ -1,6 +1,6 @@
 {
   "name": "fixed-merkle-tree",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Fixed depth merkle tree implementation with sequential inserts",
   "repository": "https://github.com/tornadocash/fixed-merkle-tree.git",
   "main": "lib/index.js",

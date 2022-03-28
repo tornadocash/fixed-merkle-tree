@@ -276,7 +276,7 @@ describe('PartialMerkleTree', () => {
 
       partialTree.insert(10)
       dst.insert(10)
-
+      assert.deepStrictEqual(partialTree.path(6), dst.path(6))
       should().equal(partialTree.root, dst.root)
     })
   })
@@ -285,12 +285,12 @@ describe('PartialMerkleTree', () => {
       const { partialTree } = getTestTrees(5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       const str = partialTree.toString()
       const dst = PartialMerkleTree.deserialize(JSON.parse(str))
-      should().equal(partialTree.root, dst.root)
-
+      assert.deepStrictEqual(partialTree.path(6), dst.path(6))
       partialTree.insert(10)
       dst.insert(10)
 
-      should().equal(partialTree.root, dst.root)
+      assert.deepStrictEqual(partialTree.path(6), dst.path(6))
+      assert.deepStrictEqual(partialTree.root, dst.root)
     })
   })
 })

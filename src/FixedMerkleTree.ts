@@ -106,7 +106,10 @@ export default class MerkleTree extends BaseTree {
    * otherwise the tree state will be invalid
    */
   static deserialize(data: SerializedTreeState, hashFunction?: HashFunction<Element>): MerkleTree {
-    return new MerkleTree(data.levels, data._layers[0], { hashFunction, zeroElement: data._zeros[0] })
+    const instance: MerkleTree = Object.assign(Object.create(this.prototype), data)
+    instance._hashFn = hashFunction || defaultHash
+    instance.zeroElement = instance._zeros[0]
+    return instance
   }
 
   toString() {

@@ -18,8 +18,7 @@ export declare type SerializedTreeState = {
 };
 export declare type SerializedPartialTreeState = {
     levels: number;
-    leaves: Element[];
-    _edgeElementsCount: number;
+    _layers: Element[][];
     _zeros: Array<Element>;
     _edgeLeafProof: ProofPath;
     _edgeLeaf: LeafWithIndex;
