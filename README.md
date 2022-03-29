@@ -40,8 +40,7 @@ console.log(path)
 const treeEdge = tree.getTreeEdge(2)
 const partialTree = new PartialMerkleTree(10, treeEdge, tree.elements.slice(treeEdge.edgeIndex))
 console.log(partialTree.elements)
-// output
-  [<2 empty items >, 3, 42, 5, 6]
+//  [<2 empty items >, 3, 42, 5, 6]
 
 const proofPath = partialTree.proof(3)
 console.log(proofPath)
