@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2019"
+    ],
+    "target": "es2017",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "types",
+    "**/*.spec.ts"
+  ]
+}
