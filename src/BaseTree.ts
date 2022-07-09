@@ -1,4 +1,4 @@
-import { Element, HashFunction, ProofPath } from './'
+import { Element, HashFunction, ProofPath, MultiProofPath } from './'
 
 export class BaseTree {
   levels: number
@@ -35,7 +35,12 @@ export class BaseTree {
    * @param fromIndex The index to start the search at. If the index is greater than or equal to the array's length, -1 is returned
    * @returns {number} Index if element is found, otherwise -1
    */
-  static indexOf(elements: Element[], element: Element, fromIndex?: number, comparator?: <T> (arg0: T, arg1: T) => boolean): number {
+  static indexOf(
+    elements: Element[],
+    element: Element,
+    fromIndex?: number,
+    comparator?: <T>(arg0: T, arg1: T) => boolean,
+  ): number {
     if (comparator) {
       return elements.findIndex((el) => comparator<Element>(element, el))
     } else {
@@ -84,7 +89,6 @@ export class BaseTree {
     this.insert(elements[elements.length - 1])
   }
 
-
   /**
    * Change an element in the tree
    * @param {number} index Index of element to change
@@ -110,7 +114,7 @@ export class BaseTree {
     let elIndex = +index
     const pathElements: Element[] = []
     const pathIndices: number[] = []
-    const pathPositions: number [] = []
+    const pathPositions: number[] = []
     for (let level = 0; level < this.levels; level++) {
       pathIndices[level] = elIndex % 2
       const leafIndex = elIndex ^ 1
@@ -129,6 +133,111 @@ export class BaseTree {
       pathPositions,
       pathRoot: this.root,
     }
+  }
+
+  /**
+   * Return the indices for the next layer in the multiPath calculation
+   * @param {number} indices A list of leaf indices
+   * @returns {number[]} the new list of indices
+   */
+  static nextLayerMultiPathIndices(indices: number[]): number[] {
+    let nextIndices: Set<number> = new Set()
+    for (let i = 0; i < indices.length; i++) {
+      let elIdx = indices[i]
+      if (elIdx % 2 === 0) {
+        nextIndices.add(Math.ceil(elIdx / 2))
+      } else {
+        nextIndices.add(Math.ceil((elIdx ^ 1) / 2))
+      }
+    }
+    return [...nextIndices]
+  }
+
+  /**
+   * Get merkle path to a list of leaves
+   * @param {number} indices A list of leaf indices to generate path for
+   * @returns {{pathElements: Element[], leafIndices: number[]}} An object containing adjacent elements and leaves indices
+   */
+  multiPath(indices: number[]): MultiProofPath {
+    let pathElements: Element[] = []
+    let layerIndices = indices
+    for (let level = 0; level < this.levels; level++) {
+      // find the neighbor idx that is not in layerIndices
+      let proofElements = layerIndices
+        .filter((idx) => !layerIndices.includes(idx ^ 1))
+        .map((idx) => this._layers[level][idx ^ 1])
+
+      if (proofElements.length == 0) {
+        break
+      }
+      pathElements = pathElements.concat(proofElements)
+      layerIndices = BaseTree.nextLayerMultiPathIndices(layerIndices)
+    }
+    return {
+      pathElements,
+      leafIndices: indices,
+      pathRoot: this.root,
+    }
+  }
+
+  /**
+   * Verifies a merkle multiproof
+   * @param {Element} root the root of the merkle tree
+   * @param {number} levels the number of levels of the tree
+   * @param {HashFunction<Element>} hashFn hash function
+   * @param {Element[]} leaves the list of leaves to be verified
+   * @param {Element[]} pathElements multiproof path elements
+   * @param {number[]} leafIndices multiproof leaf indices
+   * @returns {Boolean} whether the proof is valid for the given root
+   */
+  static verifyMultiProof(
+    root: Element,
+    levels: number,
+    hashFn: HashFunction<Element>,
+    leaves: Element[],
+    pathElements: Element[],
+    leafIndices: number[],
+  ): boolean {
+    let layerElements = leaves
+    let layerIndices = leafIndices
+    let proofElements = pathElements
+    let layerProofs = []
+
+    for (let level = 0; level < levels; level++) {
+      for (let i = 0; i < layerIndices.length; i++) {
+        let layerHash
+        let elIdx = layerIndices[i]
+        let neighbor = elIdx ^ 1
+        if (layerIndices.includes(neighbor)) {
+          if (elIdx % 2 === 0) {
+            layerHash = hashFn(layerElements[0], layerElements[1])
+          } else {
+            layerHash = hashFn(layerElements[1], layerElements[0])
+          }
+          layerElements.splice(0, 2) // remove 1st and 2nd element
+          i++ // skip next idx
+          layerProofs.push(layerHash)
+        } else {
+          if (elIdx % 2 === 0) {
+            layerHash = hashFn(layerElements[0], proofElements[0])
+          } else {
+            layerHash = hashFn(proofElements[0], layerElements[0])
+          }
+          layerElements.shift()
+          layerProofs.push(layerHash)
+          if (proofElements.shift() === undefined) {
+            break
+          }
+        }
+      }
+      layerIndices = BaseTree.nextLayerMultiPathIndices(layerIndices)
+      layerElements = layerProofs
+      if (proofElements.length == 0 && layerElements.length == 2) {
+        layerProofs[0] = hashFn(layerProofs[0], layerProofs[1])
+        break
+      }
+    }
+    return root === layerProofs[0]
   }
 
   protected _buildZeros() {
@@ -165,5 +274,4 @@ export class BaseTree {
       this._layers[level][index] = this._hashFn(left, right)
     }
   }
-
 }
