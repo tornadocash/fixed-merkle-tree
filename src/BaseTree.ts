@@ -143,12 +143,7 @@ export class BaseTree {
   static nextLayerMultiPathIndices(indices: number[]): number[] {
     let nextIndices: Set<number> = new Set()
     for (let i = 0; i < indices.length; i++) {
-      let elIdx = indices[i]
-      if (elIdx % 2 === 0) {
-        nextIndices.add(Math.ceil(elIdx / 2))
-      } else {
-        nextIndices.add(Math.ceil((elIdx ^ 1) / 2))
-      }
+      nextIndices.add(indices[i] >> 1)
     }
     return [...nextIndices]
   }
@@ -162,14 +157,18 @@ export class BaseTree {
     let pathElements: Element[] = []
     let layerIndices = indices
     for (let level = 0; level < this.levels; level++) {
-      // find the neighbor idx that is not in layerIndices
-      let proofElements = layerIndices
-        .filter((idx) => !layerIndices.includes(idx ^ 1))
-        .map((idx) => this._layers[level][idx ^ 1])
-
-      if (proofElements.length == 0) {
-        break
-      }
+      // find whether there is a neighbor idx that is not in layerIndices
+      let proofElements = layerIndices.reduce((elements, idx) => {
+        const leafIndex = idx ^ 1
+        if (!layerIndices.includes(leafIndex)) {
+          if  (leafIndex < this._layers[level].length) {
+            elements.push(this._layers[level][leafIndex])
+          } else {
+            elements.push(this._zeros[level])
+          }
+        }
+        return elements
+      }, [])
       pathElements = pathElements.concat(proofElements)
       layerIndices = BaseTree.nextLayerMultiPathIndices(layerIndices)
     }
