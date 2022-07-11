@@ -284,7 +284,7 @@ describe('MerkleTree', () => {
     it('should verify a merkle-multiproof for a range of leaves', () => {
       const leaves = [...Array(16)].map((_, i) => i + 1)
       const tree = new MerkleTree(4, leaves)
-      const expectedProof: MultiProofPath = {
+      const proof: MultiProofPath = {
         pathElements: [
           10,
           13,
@@ -303,8 +303,8 @@ describe('MerkleTree', () => {
           tree.levels,
           defaultHash,
           [3, 4, 9, 14],
-          expectedProof.pathElements,
-          expectedProof.leafIndices,
+          proof.pathElements,
+          proof.leafIndices,
         ),
       ).to.be.true
     })
