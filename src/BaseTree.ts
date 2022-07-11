@@ -197,18 +197,18 @@ export class BaseTree {
     pathElements: Element[],
     leafIndices: number[],
   ): boolean {
-    let layerElements = leaves
-    let layerIndices = leafIndices
-    let proofElements = pathElements
-    let layerProofs = []
+    let layerElements: Element[] = leaves
+    let layerIndices: number[] = leafIndices
+    let proofElements: Element[] = pathElements
+    let layerProofs: Element[] = []
 
     for (let level = 0; level < levels; level++) {
       for (let i = 0; i < layerIndices.length; i++) {
-        let layerHash
-        let elIdx = layerIndices[i]
-        let neighbor = elIdx ^ 1
-        if (layerIndices.includes(neighbor)) {
-          if (elIdx % 2 === 0) {
+        let layerHash: string
+        let elIndex = layerIndices[i]
+        let leafIndex = elIndex ^ 1
+        if (layerIndices.includes(leafIndex)) {
+          if (elIndex % 2 === 0) {
             layerHash = hashFn(layerElements[0], layerElements[1])
           } else {
             layerHash = hashFn(layerElements[1], layerElements[0])
@@ -217,12 +217,12 @@ export class BaseTree {
           i++ // skip next idx
           layerProofs.push(layerHash)
         } else {
-          if (elIdx % 2 === 0) {
+          if (elIndex % 2 === 0) {
             layerHash = hashFn(layerElements[0], proofElements[0])
           } else {
             layerHash = hashFn(proofElements[0], layerElements[0])
           }
-          layerElements.shift()
+          layerElements.shift() // remove 1st element
           layerProofs.push(layerHash)
           if (proofElements.shift() === undefined) {
             break
