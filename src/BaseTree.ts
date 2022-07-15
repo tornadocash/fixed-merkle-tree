@@ -141,7 +141,7 @@ export class BaseTree {
    * @returns {number[]} the new list of indices
    */
   static nextLayerMultiPathIndices(indices: number[]): number[] {
-    let nextIndices: Set<number> = new Set()
+    const nextIndices: Set<number> = new Set()
     for (let i = 0; i < indices.length; i++) {
       nextIndices.add(indices[i] >> 1)
     }
@@ -158,10 +158,10 @@ export class BaseTree {
     let layerIndices = indices
     for (let level = 0; level < this.levels; level++) {
       // find whether there is a neighbor idx that is not in layerIndices
-      let proofElements = layerIndices.reduce((elements, idx) => {
+      const proofElements = layerIndices.reduce((elements, idx) => {
         const leafIndex = idx ^ 1
         if (!layerIndices.includes(leafIndex)) {
-          if  (leafIndex < this._layers[level].length) {
+          if (leafIndex < this._layers[level].length) {
             elements.push(this._layers[level][leafIndex])
           } else {
             elements.push(this._zeros[level])
@@ -199,14 +199,14 @@ export class BaseTree {
   ): boolean {
     let layerElements: Element[] = leaves
     let layerIndices: number[] = leafIndices
-    let proofElements: Element[] = pathElements
-    let layerProofs: Element[] = []
+    const proofElements: Element[] = pathElements
+    const layerProofs: Element[] = []
 
     for (let level = 0; level < levels; level++) {
       for (let i = 0; i < layerIndices.length; i++) {
         let layerHash: string
-        let elIndex = layerIndices[i]
-        let leafIndex = elIndex ^ 1
+        const elIndex = layerIndices[i]
+        const leafIndex = elIndex ^ 1
         if (layerIndices.includes(leafIndex)) {
           if (elIndex % 2 === 0) {
             layerHash = hashFn(layerElements[0], layerElements[1])

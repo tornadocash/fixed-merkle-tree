@@ -70,7 +70,7 @@ export default class MerkleTree extends BaseTree {
   }
 
   multiProof(elements: Element[]): MultiProofPath {
-    let indexes = []
+    const indexes = []
     for (let i = 0; i < elements.length; i++) {
       indexes.push(this.indexOf(elements[i]))
     }
