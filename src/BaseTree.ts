@@ -180,6 +180,37 @@ export class BaseTree {
   }
 
   /**
+   * Verifies a merkle proof
+   * @param {Element} root the root of the merkle tree
+   * @param {number} levels the number of levels of the tree
+   * @param {HashFunction<Element>} hashFn hash function
+   * @param {Element} leaf the leaf to be verified
+   * @param {Element[]} pathElements adjacent path elements
+   * @param {number[]} pathIndices left-right indices
+   * @returns {Boolean} whether the proof is valid for the given root
+   */
+  static verifyProof(
+    root: Element,
+    levels: number,
+    hashFn: HashFunction<Element>,
+    leaf: Element,
+    pathElements: Element[],
+    pathIndices: number[],
+  ): boolean {
+    const layerProofs: Element[] = []
+
+    for (let level = 0; level < levels; level++) {
+      let elem = level == 0 ? leaf : layerProofs[level - 1]
+      if (pathIndices[level] == 0) {
+        layerProofs[level] = hashFn(elem, pathElements[level])
+      } else {
+        layerProofs[level] = hashFn(pathElements[level], elem)
+      }
+    }
+    return root === layerProofs[levels - 1]
+  }
+
+  /**
    * Verifies a merkle multiproof
    * @param {Element} root the root of the merkle tree
    * @param {number} levels the number of levels of the tree

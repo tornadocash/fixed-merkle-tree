@@ -1,4 +1,4 @@
-import { MerkleTree, MultiProofPath, PartialMerkleTree, TreeEdge } from '../src'
+import { MerkleTree, ProofPath, MultiProofPath, PartialMerkleTree, TreeEdge } from '../src'
 import { assert, should, expect } from 'chai'
 import { createHash } from 'crypto'
 import { it } from 'mocha'
@@ -259,6 +259,35 @@ describe('MerkleTree', () => {
     it('should return proof for leaf', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       assert.deepEqual(tree.proof(4), tree.path(3))
+    })
+  })
+
+  describe('#verifyProof', () => {
+    it('should verify a merkle-proof', () => {
+      const leaves = [...Array(16)].map((_, i) => i + 1)
+      const tree = new MerkleTree(4, leaves)
+      const proof: ProofPath = {
+        pathElements: [
+          6,
+          '1177811302158128621769756786551727063040',
+          '81822854828781486047086122479545722339328',
+          '3473994785217814971484840545214368055296'
+        ],
+        pathIndices: [ 0, 0, 1, 0 ],
+        pathPositions: [ 5, 3, 0, 1 ],
+        pathRoot: '4813607112316126252402222488335589310464'
+      }
+
+      expect(
+        BaseTree.verifyProof(
+          tree.root,
+          tree.levels,
+          defaultHash,
+          5,
+          proof.pathElements,
+          proof.pathIndices,
+        ),
+      ).to.be.true
     })
   })
 
