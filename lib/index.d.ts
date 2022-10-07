@@ -29,6 +29,11 @@ export declare type ProofPath = {
     pathPositions: number[];
     pathRoot: Element;
 };
+export declare type MultiProofPath = {
+    pathElements: Element[];
+    leafIndices: number[];
+    pathRoot: Element;
+};
 export declare type TreeEdge = {
     edgeElement: Element;
     edgePath: ProofPath;

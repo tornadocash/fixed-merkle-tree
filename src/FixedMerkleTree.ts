@@ -1,4 +1,4 @@
-import { Element, HashFunction, MerkleTreeOptions, ProofPath, SerializedTreeState, TreeEdge, TreeSlice } from './'
+import { Element, HashFunction, MerkleTreeOptions, ProofPath, MultiProofPath, SerializedTreeState, TreeEdge, TreeSlice } from './'
 import defaultHash from './simpleHash'
 import { BaseTree } from './BaseTree'
 
@@ -28,7 +28,6 @@ export default class MerkleTree extends BaseTree {
       this._layers[layerIndex] = this._processNodes(nodes, layerIndex)
     }
   }
-
 
   /**
    * Insert multiple elements into the tree.
@@ -68,6 +67,14 @@ export default class MerkleTree extends BaseTree {
   proof(element: Element): ProofPath {
     const index = this.indexOf(element)
     return this.path(index)
+  }
+
+  multiProof(elements: Element[]): MultiProofPath {
+    const indexes = []
+    for (let i = 0; i < elements.length; i++) {
+      indexes.push(this.indexOf(elements[i]))
+    }
+    return this.multiPath(indexes)
   }
 
   getTreeEdge(edgeIndex: number): TreeEdge {

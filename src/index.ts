@@ -34,6 +34,13 @@ export type ProofPath = {
   pathPositions: number[],
   pathRoot: Element
 }
+
+export type MultiProofPath = {
+  pathElements: Element[],
+  leafIndices: number[],
+  pathRoot: Element
+}
+
 export type TreeEdge = {
   edgeElement: Element;
   edgePath: ProofPath;

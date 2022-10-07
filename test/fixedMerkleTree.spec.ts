@@ -1,15 +1,15 @@
-import { MerkleTree, PartialMerkleTree, TreeEdge } from '../src'
-import { assert, should } from 'chai'
+import { MerkleTree, ProofPath, MultiProofPath, PartialMerkleTree, TreeEdge } from '../src'
+import { assert, should, expect } from 'chai'
 import { createHash } from 'crypto'
 import { it } from 'mocha'
+import { BaseTree } from '../src/BaseTree'
+import defaultHash from '../src/simpleHash'
 
 const sha256Hash = (left, right) => createHash('sha256').update(`${left}${right}`).digest('hex')
 const ZERO_ELEMENT = '21663839004416932945382355908790599225266501822907911457504978515578255421292'
 
 describe('MerkleTree', () => {
-
   describe('#constructor', () => {
-
     it('should have correct zero root', () => {
       const tree = new MerkleTree(10, [])
       return should().equal(tree.root, '3060353338620102847451617558650138132480')
@@ -207,7 +207,6 @@ describe('MerkleTree', () => {
         '4986731814143931240516913804278285467648',
         '1918547053077726613961101558405545328640',
         '5444383861051812288142814494928935059456',
-
       ])
     })
 
@@ -253,7 +252,6 @@ describe('MerkleTree', () => {
         '4986731814143931240516913804278285467648',
         '1918547053077726613961101558405545328640',
         '5444383861051812288142814494928935059456',
-
       ])
     })
   })
@@ -261,6 +259,83 @@ describe('MerkleTree', () => {
     it('should return proof for leaf', () => {
       const tree = new MerkleTree(10, [1, 2, 3, 4, 5])
       assert.deepEqual(tree.proof(4), tree.path(3))
+    })
+  })
+
+  describe('#verifyProof', () => {
+    it('should verify a merkle-proof', () => {
+      const leaves = [...Array(16)].map((_, i) => i + 1)
+      const tree = new MerkleTree(4, leaves)
+      const proof: ProofPath = {
+        pathElements: [
+          6,
+          '1177811302158128621769756786551727063040',
+          '81822854828781486047086122479545722339328',
+          '3473994785217814971484840545214368055296'
+        ],
+        pathIndices: [ 0, 0, 1, 0 ],
+        pathPositions: [ 5, 3, 0, 1 ],
+        pathRoot: '4813607112316126252402222488335589310464'
+      }
+
+      expect(
+        BaseTree.verifyProof(
+          tree.root,
+          tree.levels,
+          defaultHash,
+          5,
+          proof.pathElements,
+          proof.pathIndices,
+        ),
+      ).to.be.true
+    })
+  })
+
+  describe('#multiproof', () => {
+    it('should return a merkle-multiproof for a range of leaves in a full tree', () => {
+      const leaves = [...Array(8)].map((_, i) => i + 1)
+      const tree = new MerkleTree(3, leaves)
+      assert.deepEqual(tree.multiProof([1, 2, 6]), tree.multiPath([0, 1, 5]))
+    })
+
+    it('should return a merkle-multiproof for a leaf', () => {
+      const tree = new MerkleTree(6, [1])
+      assert.deepEqual(tree.multiProof([1]), tree.multiPath([0]))
+    })
+
+    it('should return a merkle-multiproof for a range of leaves', () => {
+      const tree = new MerkleTree(8, [1, 2, 3, 4])
+      assert.deepEqual(tree.multiProof([2, 4]), tree.multiPath([1, 3]))
+    })
+  })
+
+  describe('#verifyMultiProof', () => {
+    it('should verify a merkle-multiproof for a range of leaves', () => {
+      const leaves = [...Array(16)].map((_, i) => i + 1)
+      const tree = new MerkleTree(4, leaves)
+      const proof: MultiProofPath = {
+        pathElements: [
+          10,
+          13,
+          '4027992409016347597424110157229339967488',
+          '1344833971335891992284786489626349010944',
+          '811683747745882158385481808019325976576',
+          '770507832213726794990007789733078368256',
+        ],
+        leafIndices: [2, 3, 8, 13],
+        pathRoot: '4813607112316126252402222488335589310464',
+      }
+
+      expect(
+        BaseTree.verifyMultiProof(
+          tree.root,
+          tree.levels,
+          defaultHash,
+          [3, 4, 9, 14],
+          proof.pathElements,
+          proof.leafIndices,
+        ),
+      ).to.be.true
     })
   })
 
@@ -291,6 +366,7 @@ describe('MerkleTree', () => {
       should().throw(call, 'Element not found')
     })
   })
+
   describe('#getTreeSlices', () => {
     let fullTree: MerkleTree
     before(async () => {
@@ -344,7 +420,6 @@ describe('MerkleTree', () => {
         '4027992409016347597424110157229339967488',
         '923221781152860005594997320673730232320',
         '752191049236692618445397735417537626112',
-
       ],
       [
         '81822854828781486047086122479545722339328',
@@ -422,7 +497,6 @@ describe('MerkleTree', () => {
       dst.insert(10)
 
       should().equal(src.root, dst.root)
-
     })
   })
 })
